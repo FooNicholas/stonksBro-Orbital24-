@@ -23,7 +23,7 @@ const Login = () => {
                 </div>
 
                 <div className="inputs">
-                    {action == "Login" 
+                    {action === "Login" 
                     ? <div> </div> 
                     : <div className="input">
                         <img src={user_icon} alt="user_icon" />
@@ -41,15 +41,15 @@ const Login = () => {
                     </div>
                 </div>
 
-                {action == "Register" 
+                {action === "Register" 
                 ?<div></div>
                 :<div className="forgot-password"> Lost Password? <span> Click Here!</span> </div>
                 }
 
 
                 <div className="submit-container">
-                    <div className={action == "Login" ? "submit" : "submit gray"} onClick={() => {setAction("Register")}}> Register </div>
-                    <div className={action == "Register" ? "submit" : "submit gray"} onClick={() => {setAction("Login")}}> Login </div>
+                    <div className={action === "Login" ? "submit" : "submit gray"} onClick={() => {setAction("Register")}}> Register </div>
+                    <div className={action === "Register" ? "submit" : "submit gray"} onClick={() => {setAction("Login")}}> Login </div>
                 </div>
 
             </div>
