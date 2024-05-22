@@ -107,14 +107,14 @@
     color: #797979;
 }
 
-.create-account {
+.login-account {
     padding-left: 62px;
     margin-top: 0px;
     color: #797979;
     font-size: 19px;
 }
 
-.create-account span {
+.login-account span {
     color: black;
     cursor: pointer;
 }

@@ -1,18 +1,18 @@
 import React, { useState } from "react";
-import './Login.css'
+import './Register.css'
 import { useNavigate } from "react-router-dom";
 
+import user_icon from '../Assets/person.png'
 import email_icon from '../Assets/email.png'
 import password_icon from '../Assets/password.png'
 import logo_icon from '../Assets/stonksBro-icon.png'
 
-const Login = () => {
+const Register = () => {
 
     const navigate = useNavigate();
-    const navigateToRegister = () => {
-    navigate('/Register');
+    const navigateToLogin = () => {
+    navigate('/');
     };
-
 
     return (
         <>
@@ -21,11 +21,15 @@ const Login = () => {
             </div>
             <div className="container">
                 <div className="header">
-                    <div className="text"> Login </div>
+                    <div className="text"> Register </div>
                     <div className="underline"></div>
                 </div>
 
                 <div className="inputs">
+                    <div className="input">
+                        <img src={user_icon} alt="user_icon" />
+                        <input type="text" placeholder="Username"/>
+                    </div> 
                     
                     <div className="input">
                         <img src={email_icon} alt="email_icon" />
@@ -36,21 +40,16 @@ const Login = () => {
                         <input type="password" placeholder="Password"/>
                     </div>
                 </div>
-                
-                <div className="forgot-password"> Lost Password? <span> Click Here!</span> </div>
-                
+
                 <div className="submit-container">
-                    <div className="submit"> Login </div>
+                    <div className="submit"> Register </div>
                 </div>
 
-                <div className="create-account">                   
-                    Don't have an account? <span onClick={navigateToRegister}> Click Here to Register! </span>
-                </div>
+                <div className="login-account"> Already Have an Account? <span onClick={navigateToLogin}>Click Here to Login!</span></div>
 
             </div>
-
         </>
     )
 }
 
-export default Login
+export default Register
