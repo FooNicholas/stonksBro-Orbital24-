@@ -84,7 +84,7 @@
 
 .submit-container {
     display: flex;
-    gap: 30px;
+    justify-content: center;
     margin: 40px auto;
 }
 

@@ -1,4 +1,3 @@
-import React, { useState } from "react";
 import './Login.css'
 import { useNavigate } from "react-router-dom";
 
@@ -10,7 +9,7 @@ const Login = () => {
 
     const navigate = useNavigate();
     const navigateToRegister = () => {
-    navigate('/Register');
+    navigate('/register');
     };
 
 
@@ -20,28 +19,30 @@ const Login = () => {
                 <img src={logo_icon} alt="stonksBro"></img>
             </div>
             <div className="container">
-                <div className="header">
-                    <div className="text"> Login </div>
-                    <div className="underline"></div>
-                </div>
+                    <div className="header">
+                        <div className="text"> Login </div>
+                        <div className="underline"></div>
+                    </div>
 
-                <div className="inputs">
+                <form action="auth/login" method="POST">
+                    <div className="inputs">
+                        
+                        <div className="input">
+                            <img src={email_icon} alt="email_icon" />
+                            <input type="email" placeholder="Email" id="email" name="email"/>
+                        </div>
+                        <div className="input">
+                            <img src={password_icon} alt="password_icon" />
+                            <input type="password" placeholder="Password" id="password" name="password"/>
+                        </div>
+                    </div>
                     
-                    <div className="input">
-                        <img src={email_icon} alt="email_icon" />
-                        <input type="email" placeholder="Email" />
+                    <div className="forgot-password"> Lost Password? <span> Click Here!</span> </div>
+                    
+                    <div className="submit-container">
+                        <button type="submit" className="submit"> Login </button>
                     </div>
-                    <div className="input">
-                        <img src={password_icon} alt="password_icon" />
-                        <input type="password" placeholder="Password"/>
-                    </div>
-                </div>
-                
-                <div className="forgot-password"> Lost Password? <span> Click Here!</span> </div>
-                
-                <div className="submit-container">
-                    <div className="submit"> Login </div>
-                </div>
+                </form>
 
                 <div className="create-account">                   
                     Don't have an account? <span onClick={navigateToRegister}> Click Here to Register! </span>
