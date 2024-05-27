@@ -1,4 +1,5 @@
 import './Register.css'
+import { useState } from 'react';
 import { useNavigate } from "react-router-dom";
 
 import user_icon from '../Assets/person.png'
@@ -13,6 +14,48 @@ const Register = () => {
     navigate('/');
     };
 
+    const [formData, setFormData] = useState({
+        username: '',
+        email: '',
+        password: '',
+        passwordConfirm: ''
+    });
+
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setFormData({
+            ...formData,
+            [name]: value
+        })
+    }
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+    
+        if (formData.password !== formData.passwordConfirm) {
+            alert("Passwords do not match!");
+            return;
+        }
+    
+        try {
+            const response = await fetch('http://localhost:5000/register', { 
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',  
+                },
+                body: JSON.stringify(formData)  
+            });
+    
+            if (response.ok) {
+                navigateToLogin();
+            } else {
+                console.error('Registration failed');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    }
+
     return (
         <>
             <div className="header-icon">
@@ -23,24 +66,24 @@ const Register = () => {
                     <div className="text"> Register </div>
                     <div className="underline"></div>
                 </div>
-            <form action="auth/register" method="POST">
+            <form onSubmit={handleSubmit}>
                 <div className="inputs">
                     <div className="input">
                         <img src={user_icon} alt="user_icon" />
-                        <input type="text" placeholder="Username" id='Username' name='username'/>
+                        <input type="text" placeholder="Username" name='username' value={formData.username} onChange={handleChange}/>
                     </div> 
                     
                     <div className="input">
                         <img src={email_icon} alt="email_icon" />
-                        <input type="email" placeholder="Email" id='email' name='email'/>
+                        <input type="email" placeholder="Email" name='email' value={formData.email} onChange={handleChange}/>
                     </div>
                     <div className="input">
                         <img src={password_icon} alt="password_icon" />
-                        <input type="password" placeholder="Password" id='password' name='password'/>
+                        <input type="password" placeholder="Password" name='password' value={formData.password} onChange={handleChange}/>
                     </div>
                     <div className="input">
                         <img src={password_icon} alt="password_icon" />
-                        <input type="password" placeholder="Confirm Password" id='passwordConfirm' name='passwordConfirm'/>
+                        <input type="password" placeholder="Confirm Password" name='passwordConfirm' value={formData.passwordConfirm} onChange={handleChange}/>
                     </div>
                 </div>
 
