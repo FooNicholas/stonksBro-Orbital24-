@@ -1,9 +1,10 @@
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
-const mysql = require('mysql');
 const path = require('path');
 const bcrypt = require('bcrypt');
+const { createClient } = require('@supabase/supabase-js')
 
 const app = express();
 const port = 5000;
@@ -13,86 +14,79 @@ app.use(express.static(path.join(__dirname, 'stonksbro-app', 'public')));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
-const db = mysql.createConnection( {
-  host: 'localhost',
-  user: 'root',
-  password: '',
-  database: 'stonksbro' 
-})
+const supabaseURL = 'https://bihxlkqzfksexusydreo.supabase.co';
+const supabaseKey = process.env.SUPABASE_KEY;
+const supabase = createClient(supabaseURL, supabaseKey);
 
-db.connect( (error) => {
-  if (error) {
-    console.log(error)
-  } else {
-    console.log('MySQL Connected')
-  }
-})
-
-app.post('/', (req, res) => {
+app.post('/', async (req, res) => {
   const { email, password } = req.body;
 
   if (!email || !password) {
     return res.status(400).send('Email and password are required.');
   }
 
-  const query = 'SELECT * FROM users WHERE email = ?';
-  db.query(query, [email, password], async (err, results) => {
-    if (err) {
-      return res.status(500).send('Server error.');
-    }
+  const { data: users, error } = await supabase
+    .from('users')
+    .select()
+    .eq('email', email);
 
-    if (results.length === 0) {
-      return res.status(401).send('Invalid email or password.');
-    }
+  if (error) {
+    return res.status(500).send('Server error.');
+  }
 
-    const user = results[0];
-    const isPasswordValid = await bcrypt.compare(password, user.hashedPassword);
+  if (users.length === 0) {
+    return res.status(401).send('Invalid email or password.');
+  }
 
-    if (isPasswordValid) {
-      res.status(200).send('Login successful.');
-    } else {
-      res.status(401).send('Invalid email or password.');
-    }    
-  });
+  const user = users[0];
+  const isPasswordValid = await bcrypt.compare(password, user.hashedPassword);
+
+  if (isPasswordValid) {
+    res.status(200).send('Login successful.');
+  } else {
+    res.status(401).send('Invalid email or password.');
+  }
 });
 
-
-app.post('/register', (req,res) => {
-  const {username, email, password, passwordConfirm} = req.body;
+app.post('/register', async (req, res) => {
+  const { username, email, password, passwordConfirm } = req.body;
 
   if (!username || !email || !password || !passwordConfirm) {
-    return res.send(400).send('All fields are required.');
+    return res.status(400).send('All fields are required.');
   }
 
   if (password !== passwordConfirm) {
     return res.status(400).send('Passwords do not match.');
   }
 
-  // Optional: Check if user already exists
-  db.query('SELECT * FROM users WHERE email = ? OR username = ?', [email, username], async (err, results) => {
-    if (err) {
-      console.error('Database query error:', err);
-      return res.status(500).send('Internal server error.');
-    }
+  const { data: existingUsers, error: existingUsersError } = await supabase
+    .from('users')
+    .select()
+    .or(`email.eq.${email},username.eq.${username}`);
 
-    if (results.length > 0) {
-      return res.status(400).send('User with this email or username already exists.');
-    }
+  if (existingUsersError) {
+    console.error('Supabase error:', existingUsersError.message);
+    return res.status(500).send('Internal server error.');
+  }
 
-    let hashedPassword = await bcrypt.hash(password, 10);
+  if (existingUsers.length > 0) {
+    return res.status(400).send('User with this email or username already exists.');
+  }
 
-    // Insert new user into the database
-    const newUser = { username, email, hashedPassword };
-    db.query('INSERT INTO users SET ?', newUser, (err, result) => {
-      if (err) {
-        console.error('Error inserting user:', err);
-        return res.status(500).send('Internal server error.');
-      }
+  let hashedPassword = await bcrypt.hash(password, 10);
 
-      res.status(200).send('Registration successful');
-    });
-  });
+  const { data: newUser, error: insertError } = await supabase
+    .from('users')
+    .insert([{ username, email, hashedPassword }]);
+
+  if (insertError) {
+    console.error('Supabase error:', insertError.message);
+    return res.status(500).send('Internal server error.');
+  }
+
+  res.status(200).send('Registration successful');
 });
+
 
 let portfolio = [
   { symbol: 'AAPL', quantity: 10 },
