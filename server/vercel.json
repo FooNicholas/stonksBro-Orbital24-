@@ -1,15 +1,16 @@
-{   
+{
     "version": 2,
     "builds": [
-        {
-          "src": "./server.js",
-          "use": "@vercel/node"
-        }
-      ],
-      "routes": [
-        {
-          "src": "/(.*)",
-          "dest": "/"
-        }
-      ]
+      {
+        "src": "server.js",
+        "use": "@vercel/node"
+      }
+    ],
+    "routes": [
+      { "src": "/login", "dest": "server.js" },
+      { "src": "/register", "dest": "server.js" },
+      { "src": "/portfolio", "dest": "server.js" },
+      { "src": "/trade", "dest": "server.js" },
+      { "src": "/.*", "dest": "server.js" }
+    ]
 }
