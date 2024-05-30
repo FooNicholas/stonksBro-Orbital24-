@@ -18,10 +18,6 @@ const supabaseURL = 'https://bihxlkqzfksexusydreo.supabase.co';
 const supabaseKey = process.env.SUPABASE_KEY;
 const supabase = createClient(supabaseURL, supabaseKey);
 
-app.use('/', (req,res) => {
-  res.send('Server is running!');
-});
-
 app.post('/login', async (req, res) => {
   const { email, password } = req.body;
 
