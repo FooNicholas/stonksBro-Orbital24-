@@ -7,7 +7,6 @@ const bcrypt = require('bcrypt');
 const { createClient } = require('@supabase/supabase-js')
 
 const app = express();
-const port = 5000;
 
 app.use(cors());
 app.use(express.static(path.join(__dirname, 'stonksbro-app', 'public')));
