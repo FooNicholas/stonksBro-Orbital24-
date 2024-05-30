@@ -38,7 +38,7 @@ const Register = () => {
         }
     
         try {
-            const response = await fetch('stonks-bro-orbital24-server.vercel.app/register', { 
+            const response = await fetch('https://stonks-bro-orbital24-server.vercel.app/register', { 
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',  

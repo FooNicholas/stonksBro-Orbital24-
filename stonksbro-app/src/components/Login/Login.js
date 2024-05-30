@@ -34,7 +34,7 @@ const Login = () => {
         e.preventDefault();
         if (validateForm()) {
           try {
-            const response = await fetch('stonks-bro-orbital24-server.vercel.app/login', {
+            const response = await fetch('https://stonks-bro-orbital24-server.vercel.app/login', {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',
