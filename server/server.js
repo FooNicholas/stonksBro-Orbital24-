@@ -4,6 +4,7 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const path = require('path');
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 const { createClient } = require('@supabase/supabase-js')
 
 const app = express();
@@ -17,6 +18,8 @@ app.use(bodyParser.json());
 const supabaseURL = 'https://bihxlkqzfksexusydreo.supabase.co';
 const supabaseKey = process.env.SUPABASE_KEY;
 const supabase = createClient(supabaseURL, supabaseKey);
+
+const JWT_SECRET = process.env.JWT_SECRET;
 
 app.post('/login', async (req, res) => {
   const { email, password } = req.body;
@@ -42,7 +45,8 @@ app.post('/login', async (req, res) => {
   const isPasswordValid = await bcrypt.compare(password, user.hashedPassword);
 
   if (isPasswordValid) {
-    res.status(200).send('Login successful.');
+    const token = jwt.sign({email: user.email, id: user.id}, JWT_SECRET, {expiresIn: '1h'});
+    res.status(200).send({token, message: 'Login successful.'});
   } else {
     res.status(401).send('Invalid email or password.');
   }

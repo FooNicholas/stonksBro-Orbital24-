@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate } from "react-router-dom";
+import { useAuth } from '../AuthContext/AuthContext';
 import './Dashboard.css';
 
 import logo_icon from '../Assets/stonksBro-icon.png'
@@ -7,8 +8,10 @@ import logo_icon from '../Assets/stonksBro-icon.png'
 const Dashboard = () => {
 
     const navigate = useNavigate();
+    const { logout } = useAuth();
+
     const onLogout = () => {
-        navigate('/');
+        logout();
     };
 
     const [stocks, setStocks] = useState([]);

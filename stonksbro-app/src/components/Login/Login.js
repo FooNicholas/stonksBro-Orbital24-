@@ -1,20 +1,20 @@
-import './Login.css'
-import { useState } from 'react';
-import { useNavigate } from "react-router-dom";
+  import './Login.css'
+  import { useState, createContext, useContext } from 'react';
+  import { useNavigate } from "react-router-dom";
+  import { useAuth } from '../AuthContext/AuthContext';
 
-import email_icon from '../Assets/email.png'
-import password_icon from '../Assets/password.png'
-import logo_icon from '../Assets/stonksBro-icon.png'
+  import email_icon from '../Assets/email.png'
+  import password_icon from '../Assets/password.png'
+  import logo_icon from '../Assets/stonksBro-icon.png'
 
-const Login = () => {
+  const Login = () => {
+
+    const { login } = useAuth();
 
     const navigate = useNavigate();
     const navigateToRegister = () => {
         navigate('/register');
     };
-    const navigateToDashboard = () => {
-        navigate('/dashboard');
-    }
 
     const [formData, setFormData] = useState({
         email: '',
@@ -30,39 +30,41 @@ const Login = () => {
         });
       };
     
-      const handleSubmit = async (e) => {
-        e.preventDefault();
-        if (validateForm()) {
-          try {
-            const response = await fetch('https://stonks-bro-orbital24-server.vercel.app/login', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify(formData),
-            });
-    
-            if (response.ok) {
-              console.log('Login successful');
-              navigate('/dashboard');
-            } else {
-              const errorText = await response.text();
-              setError(errorText);
-            }
-          } catch (error) {
-            setError('Server error. Please try again later.');
+    const handleSubmit = async (e) => {
+      e.preventDefault();
+      if (validateForm()) {
+        try {
+          const response = await fetch('https://stonks-bro-orbital24-server.vercel.app/login', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(formData),
+          });
+  
+          if (response.ok) {
+            // const { token } = await response.json(); 
+            console.log('Login successful');
+            login(); //if token is passed as an arguement, not redirecting to /dashboard 
+            navigate('/dashboard')
+          } else {
+            const errorText = await response.text();
+            setError(errorText);
           }
+        } catch (error) {
+          setError('Server error. Please try again later.');
         }
-      };
+      }
+    };
     
-      const validateForm = () => {
-        if (!formData.email || !formData.password) {
-          setError('Email and password are required.');
-          return false;
-        }
-        setError('');
-        return true;
-      };
+    const validateForm = () => {
+      if (!formData.email || !formData.password) {
+        setError('Email and password are required.');
+        return false;
+      }
+      setError('');
+      return true;
+    };
 
     return (
         <>
@@ -113,6 +115,6 @@ const Login = () => {
 
         </>
     )
-}
+  }
 
-export default Login
+  export default Login
