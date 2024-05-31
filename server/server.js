@@ -19,8 +19,6 @@ const supabaseURL = 'https://bihxlkqzfksexusydreo.supabase.co';
 const supabaseKey = process.env.SUPABASE_KEY;
 const supabase = createClient(supabaseURL, supabaseKey);
 
-const JWT_SECRET = process.env.JWT_SECRET;
-
 app.post('/login', async (req, res) => {
   const { email, password } = req.body;
 
