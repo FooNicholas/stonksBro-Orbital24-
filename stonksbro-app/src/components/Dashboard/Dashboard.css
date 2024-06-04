@@ -1,94 +1,145 @@
+body {
+    margin: 0;
+    padding: 0;
+    font-family: sans-serif, Arial;
+    background-color: lightblue; /* Change background color of the entire page */
+}
+
 .header-container {
-    background-color: #fff;
+    width: 100%;
+    background-color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: sans-serif, Arial;
+}
+
+.left-container {
+    display: flex;
+    align-items: center;
 }
 
 .logo-fixed {
-    position: fixed;
+    margin: 10px;
+    margin-left: 20px;
     width: 200px;
     height: 50px;
-    
+}
+.button-group-left {
+    display: flex;
+    gap: 10px;
 }
 
-.profile {
-    position: fixed;
-    top: 10px; 
-    right: 120px; 
-    z-index: 1000;
-    width: 100px;
-    height: 40px;
-    color: black;
-    background-color: white;
-    border-radius: 10px;
-    font-size: 15px;
-    font-weight: 10;
-    cursor: pointer;
-}
-
-.button-fixed {
-    position: fixed;
-    top: 10px; 
-    right: 10px; 
-    z-index: 1000;
-    width: 100px;
-    height: 40px;
-    color: black;
-    background-color: white;
-    border-radius: 10px;
-    font-size: 15px;
-    font-weight: 10;
-    cursor: pointer;
+.button-group-right {
+    display: flex;
+    gap: 10px;
 }
 
 .dashboard {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 20px;
-    font-family: Arial, sans-serif;
-}
-
-.header {
-    font-size: 24px;
-    margin-bottom: 20px;
-    color: #fff;
-}
-
-.stock-list {
-    color: #fff;
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    max-width: 600px;
-}
-
-.stock-item {
-    display: flex;
-    justify-content: space-between;
-    padding: 10px;
-    border: 1px solid #ddd;
-    margin-bottom: 10px;
-    border-radius: 5px;
-}
-
-.portfolio {
-    color: #fff;
-    margin-top: 20px;
-    width: 100%;
-    max-width: 600px;
-}
-
-.buy-sell-form {
-    margin-top: 20px;
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    max-width: 600px;
-}
-
-.buy-sell-form input, .buy-sell-form button {
-    padding: 10px;
-    margin-bottom: 10px;
-    border-radius: 5px;
-    border: 1px solid #ddd;
+    width: 100px;
+    height: 40px;
+    color: Black;
+    background-color: #f0f0f0;
+    border-radius: 10px;
+    font-size: 15px;
     cursor: pointer;
+    border: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: sans-serif, Arial;
+}
+
+.profile, .logout, .practice {
+    width: 100px;
+    height: 40px;
+    color: black;
+    background-color: white;
+    border-radius: 10px;
+    font-size: 15px;
+    cursor: pointer;
+    border: 1px solid #ccc;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: sans-serif, Arial;
+}
+
+.logout {
+    margin-right: 20px; /* Adjust spacing between buttons and right side of screen */
+}
+.logout-icon {
+    width: 30px;
+    height: 30px;
+}
+
+.body-container {
+    min-height: 80vh;
+    display: flex;
+    flex-direction: row;
+    background-color: white;
+    border-radius: 10px;
+    padding: 20px;
+    margin-top: 40px; 
+    margin-left: 200px;
+    margin-right: 200px;
+}
+
+.body-left {
+    flex: 1; 
+    border-radius: 10px;
+    margin-right: 10px; 
+    margin-left: 10px;
+    background-color: lightgray;
+    overflow-y: auto;
+}
+
+.search-bar {
+    display: flex;
+    align-items: center;
+    margin-top: 10px; 
+    margin-left: 20px;
+    margin-right: 20px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    background-color: white;
+    border-radius: 50px;
+    box-sizing: border-box;
+}
+
+.search-input {
+    flex: 1; /* Take up remaining space */
+    border: none; /* Remove default input border */
+    outline: none; /* Remove default input outline */
+    margin-left: 10px; /* Add some spacing between the icon and input */
+}
+
+.body-right {
+    flex: 1; 
+    margin-left: 10px; 
+    margin-right: 10px;
+    border-radius: 10px;
+    background-color: lightgray;
+    overflow-y: auto;
+}
+
+.body-button-group {
+    display: flex; /* Display flex */
+    gap: 10px; /* Gap between buttons */
+    margin: 10px;
+}
+
+.news, .graph {
+    width: 100px;
+    height: 40px;
+    color: black;
+    background-color: white;
+    border-radius: 10px;
+    font-size: 15px;
+    cursor: pointer;
+    border: 1px solid #ccc;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: sans-serif, Arial;
 }
