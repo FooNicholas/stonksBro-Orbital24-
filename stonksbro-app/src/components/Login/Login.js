@@ -2,6 +2,7 @@
   import { useState, createContext, useContext } from 'react';
   import { useNavigate } from "react-router-dom";
   import { useAuth } from '../AuthContext/AuthContext';
+  import MessageBox from '../MessageBox/MessageBox';
 
   import email_icon from '../Assets/email.png'
   import password_icon from '../Assets/password.png'
@@ -15,6 +16,8 @@
     const navigateToRegister = () => {
         navigate('/register');
     };
+
+    const [errorMessage, setErrorMessage] = useState('');
 
     const [formData, setFormData] = useState({
         email: '',
@@ -49,9 +52,12 @@
             navigate('/dashboard')
           } else {
             const errorText = await response.text();
+            setErrorMessage(errorText);
             setError(errorText);
           }
         } catch (error) {
+          console.error('Error:', error);
+          setErrorMessage('An error occurred. Please try again.');
           setError('Server error. Please try again later.');
         }
       }
@@ -59,6 +65,7 @@
     
     const validateForm = () => {
       if (!formData.email || !formData.password) {
+        setErrorMessage('Email and password are required.');
         setError('Email and password are required.');
         return false;
       }
@@ -112,7 +119,7 @@
                 </div>
 
             </div>
-
+            <MessageBox message={errorMessage} onClose={() => setErrorMessage('')} />
         </>
     )
   }
