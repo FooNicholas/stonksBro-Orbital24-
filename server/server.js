@@ -94,27 +94,6 @@ app.post('/register', async (req, res) => {
   res.status(200).send('Registration successful');
 });
 
-
-let portfolio = [
-  { symbol: 'AAPL', quantity: 10 },
-  { symbol: 'GOOGL', quantity: 5 },
-];
-
-app.get('/portfolio', (req, res) => {
-  res.json(portfolio);
-});
-
-app.post('/trade', (req, res) => {
-  const { symbol, quantity, action } = req.body;
-  if (action === 'buy') {
-      portfolio.push({ symbol, quantity });
-  } else if (action === 'sell') {
-      portfolio = portfolio.filter(item => item.symbol !== symbol);
-  }
-  res.json(portfolio);
-});
-
-
 app.listen(port, () => {
   console.log(`Server is running on port: ${port}`);
 });
