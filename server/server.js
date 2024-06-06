@@ -71,7 +71,13 @@ app.post('/register', async (req, res) => {
   }
 
   if (existingUsers.length > 0) {
-    return res.status(400).send('User with this email or username already exists.');
+    if (existingUsers.some(user => user.email === email)) {
+      return res.status(400).send('Email is already registered.');
+    }
+    if (existingUsers.some(user => user.username === username)) {
+      return res.status(400).send('Username is already taken.');
+    }
+
   }
 
   let hashedPassword = await bcrypt.hash(password, 10);

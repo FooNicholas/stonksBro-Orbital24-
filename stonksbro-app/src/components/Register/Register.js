@@ -1,6 +1,7 @@
 import './Register.css'
 import { useState } from 'react';
 import { useNavigate } from "react-router-dom";
+import MessageBox from '../MessageBox/MessageBox';
 
 import user_icon from '../Assets/person.png'
 import email_icon from '../Assets/email.png'
@@ -21,6 +22,9 @@ const Register = () => {
         passwordConfirm: ''
     });
 
+    const [errorMessage, setErrorMessage] = useState('');
+
+
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData({
@@ -31,9 +35,14 @@ const Register = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-    
+        
+        if (!formData.username || !formData.email || !formData.password || !formData.passwordConfirm) {
+            setErrorMessage("All fields are required!");
+            return;
+        }
+
         if (formData.password !== formData.passwordConfirm) {
-            alert("Passwords do not match!");
+            setErrorMessage("Passwords do not match!");
             return;
         }
     
@@ -49,10 +58,12 @@ const Register = () => {
             if (response.ok) {
                 navigateToLogin();
             } else {
-                console.error('Registration failed');
+                const errorText = await response.text();
+                setErrorMessage(errorText);
             }
         } catch (error) {
             console.error('Error:', error);
+            setErrorMessage('An error occurred. Please try again.');
         }
     }
 
@@ -93,9 +104,9 @@ const Register = () => {
             </form>
 
                 <div className="login-account"> Already Have an Account? <span onClick={navigateToLogin}>Click Here to Login!</span></div>
-
-                
+             
             </div>
+            <MessageBox message={errorMessage} onClose={() => setErrorMessage('')} /> 
         </>
     )
 }
