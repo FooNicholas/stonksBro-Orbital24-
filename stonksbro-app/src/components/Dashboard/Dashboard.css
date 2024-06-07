@@ -76,13 +76,14 @@ body {
 .body-container {
     min-height: 80vh;
     display: flex;
-    flex-direction: row;
-    background-color: white;
+    flex-direction: column;
+    background-color: rgb(21,25,36);
     border-radius: 10px;
     padding: 20px;
     margin-top: 40px; 
     margin-left: 200px;
     margin-right: 200px;
+    height: calc(100vh - 200px);
 }
 
 .body-left {

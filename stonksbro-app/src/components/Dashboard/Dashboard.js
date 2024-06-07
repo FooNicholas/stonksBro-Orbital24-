@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import { useAuth } from '../AuthContext/AuthContext';
+import TradingViewWidget from '../TradingViewWidget/TradingViewWidget';
 import './Dashboard.css';
 
 import logo_icon from '../Assets/stonksBro-icon.png'
 import logout_icon from '../Assets/log-out-outline.png'
+
 
 const Dashboard = () => {
 
@@ -35,17 +37,7 @@ const Dashboard = () => {
                 </div>
             </div>
             <div className='body-container'>
-                <div className='body-left'>
-                    <div className='search-bar'>
-                    <input type="text" className="search-input" placeholder="Search..."/>
-                    </div>
-                </div>               
-                <div className='body-right'>
-                    <div className='body-button-group'>
-                        <div className='graph'> Graphs </div>
-                        <div className='news'> News </div>
-                    </div>                   
-                </div>
+                <TradingViewWidget />
             </div>
         </>
     );
