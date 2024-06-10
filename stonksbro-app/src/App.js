@@ -5,6 +5,8 @@ import Login from "./components/Login/Login";
 import Register from "./components/Register/Register";
 import Dashboard from './components/Dashboard/Dashboard';
 import ProtectedRoute from './components/ProtectedRoute/ProtectedRoute';
+import Reset from './components/Reset/Reset'
+import UpdatePassword from './components/UpdatePassword/UpdatePassword';
 
 
 function App() {
@@ -14,6 +16,8 @@ function App() {
       <Routes>
         <Route path="/" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/reset-password" element={<Reset />} />
+        <Route path='/update-password' element={<UpdatePassword/>} />
         <Route 
           path="/dashboard" 
           element={

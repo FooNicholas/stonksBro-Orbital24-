@@ -16,22 +16,26 @@
     const navigateToRegister = () => {
         navigate('/register');
     };
+    const navigateToReset = () => {
+      navigate('/reset-password');
+    }
 
     const [errorMessage, setErrorMessage] = useState('');
 
     const [formData, setFormData] = useState({
         email: '',
         password: '',
-      });
-      const [error, setError] = useState('');
+    });
+      
+    const [error, setError] = useState('');
     
-      const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormData({
-          ...formData,
-          [name]: value,
-        });
-      };
+    const handleChange = (e) => {
+      const { name, value } = e.target;
+      setFormData({
+        ...formData,
+        [name]: value,
+      });
+    };
     
     const handleSubmit = async (e) => {
       e.preventDefault();
@@ -107,7 +111,9 @@
                         </div>
                     </div>
                 
-                    <div className="forgot-password"> Lost Password? <span> Click Here!</span> </div>
+                    <div className="forgot-password"> 
+                      Lost Password? <span onClick={navigateToReset}> Click Here!</span> 
+                    </div>
                     
                     <div className="submit-container">
                         <button type="submit" className="submit"> Login </button>
