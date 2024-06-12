@@ -6,8 +6,7 @@ const path = require('path');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { createClient } = require('@supabase/supabase-js');
-import { Resend } from 'resend';
-
+const nodemailer = require('nodemailer');
 
 const app = express();
 const port = process.env.PORT || 5000;
@@ -20,6 +19,14 @@ app.use(bodyParser.json());
 const supabaseURL = 'https://bihxlkqzfksexusydreo.supabase.co';
 const supabaseKey = process.env.SUPABASE_KEY;
 const supabase = createClient(supabaseURL, supabaseKey);
+
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: process.env.EMAIL_ADD,
+    pass: process.env.APP_PW,
+  },
+});
 
 app.post('/login', async (req, res) => {
   const { email, password } = req.body;
@@ -114,36 +121,76 @@ app.post('/reset', async (req, res) => {
     return res.status(404).send('User not found');
   }
 
-  const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: 'http://localhost:3000/update-password'
-  });
+  const resetToken = require('crypto').randomBytes(20).toString('hex');
+  const expiration = new Date();
+  expiration.setHours(expiration.getHours() + 1); // 1 hour expiration
 
-  if (resetError) {
-    console.error('Supabase error:', resetError.message);
+  const { error: tokenError } = await supabase
+    .from('users')
+    .update({ reset_token: resetToken, reset_token_expiration: expiration })
+    .eq('id', user.id);
+
+  if (tokenError) {
+    console.error('Supabase error:', tokenError.message);
     return res.status(500).send('Internal server error.');
   }
 
-  res.status(200).send('Password reset email sent.');
+  const resetURL = `https://stonks-bro-orbital24.vercel.app/update-password?token=${resetToken}`;
+  const mailOptions = {
+    from: process.env.EMAIL_ADD,
+    to: email,
+    subject: 'Password Reset',
+    html: `
+    <p>You requested a password reset.</p>
+    <p>Click the link below to reset your password:</p>
+    <a href="${resetURL}" style="background-color: #4CAF50; color: white; padding: 10px 20px; text-align: center; text-decoration: none; display: inline-block; font-size: 16px;">Reset Password</a>
+    <p>If you did not request this, please ignore this email.</p>` 
+  };
+
+  console.log(mailOptions);
+
+  transporter.sendMail(mailOptions, (error, info) => {
+    if (error) {
+      console.error('Error sending email:', error);
+      return res.status(500).send('Error sending email.');
+    }
+    res.status(200).send('Password reset email sent.');
+  });
 });
 
 
 app.post('/update-password', async (req, res) => {
-  const { accessToken, newPassword } = req.body;
+  const { token, newPassword } = req.body;
 
-  if (!accessToken || !newPassword) {
-    return res.status(400).send('Access token and new password are required.');
+  if (!token || !newPassword) {
+    return res.status(400).send('Token and new password are required.');
+  }
+
+  const { data: user, error: userError } = await supabase
+    .from('users')
+    .select('id, reset_token_expiration')
+    .eq('reset_token', token)
+    .single();
+
+  if (userError || !user) {
+    console.error('Supabase error:', userError ? userError.message : 'User not found');
+    return res.status(400).send('Invalid or expired token.');
+  }
+
+  const now = new Date();
+  if (now > new Date(user.reset_token_expiration)) {
+    return res.status(400).send('Token has expired.');
   }
 
   let hashedPassword = await bcrypt.hash(newPassword, 10);
 
-  const { data, error } = await supabase.auth.updateUser({
-    password: hashedPassword
-  }, {
-    headers: { Authorization: `Bearer ${accessToken}` }
-  });
+  const { error: updateError } = await supabase
+    .from('users')
+    .update({ hashedPassword: hashedPassword, reset_token: null, reset_token_expiration: null })
+    .eq('id', user.id);
 
-  if (error) {
-    console.error('Supabase error:', error.message);
+  if (updateError) {
+    console.error('Supabase error:', updateError.message);
     return res.status(500).send('Internal server error.');
   }
 

@@ -1,5 +1,5 @@
 import './UpdatePassword.css';
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from "react-router-dom";
 import MessageBox from '../MessageBox/MessageBox';
 
@@ -10,7 +10,11 @@ const UpdatePassword = () => {
   const [errorMessage, setErrorMessage] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
   const navigate = useNavigate();
+
   const location = useLocation();
+  const query = new URLSearchParams(location.search);
+  const token = query.get('token');
+
 
   const [formData, setFormData] = useState({
     password: '',
@@ -25,17 +29,9 @@ const UpdatePassword = () => {
     });
   };
 
-  useEffect(() => {
-    const searchParams = new URLSearchParams(location.search);
-    const accessToken = searchParams.get('access_token');
-
-    if (!accessToken) {
-      setErrorMessage('Access token not found.');
-    }
-  }, [location.search]);
-
   const handleUpdatePassword = async (e) => {
     e.preventDefault();
+
     if (!formData.password || !formData.passwordConfirm) {
       setErrorMessage('Please enter and confirm your new password.');
       return;
@@ -46,17 +42,13 @@ const UpdatePassword = () => {
       return;
     }
 
-    const searchParams = new URLSearchParams(location.search);
-    const accessToken = searchParams.get('access_token');
-
     try {
-      const response = await fetch('http://localhost:5000/update-password', {
+      const response = await fetch('https://stonks-bro-orbital24.vercel.app/update-password', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${accessToken}`
         },
-        body: JSON.stringify({ password: formData.password }),
+        body: JSON.stringify({ token: token, newPassword: formData.password }),
       });
 
       if (response.ok) {

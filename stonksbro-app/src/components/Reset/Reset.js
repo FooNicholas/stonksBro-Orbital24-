@@ -37,7 +37,7 @@ const Reset = () => {
         }
     
         try {
-          const response = await fetch('http://localhost:5000/reset', {
+          const response = await fetch('https://stonks-bro-orbital24.vercel.app/reset', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
