@@ -2,7 +2,7 @@ body {
     margin: 0;
     padding: 0;
     font-family: sans-serif, Arial;
-    background-color: lightblue; /* Change background color of the entire page */
+    background-color: lightblue;
 }
 
 .header-container {
@@ -66,7 +66,7 @@ body {
 }
 
 .logout {
-    margin-right: 20px; /* Adjust spacing between buttons and right side of screen */
+    margin-right: 20px; 
 }
 .logout-icon {
     width: 30px;
@@ -108,10 +108,10 @@ body {
 }
 
 .search-input {
-    flex: 1; /* Take up remaining space */
-    border: none; /* Remove default input border */
-    outline: none; /* Remove default input outline */
-    margin-left: 10px; /* Add some spacing between the icon and input */
+    flex: 1;
+    border: none;
+    outline: none; 
+    margin-left: 10px; 
 }
 
 .body-right {
@@ -124,8 +124,8 @@ body {
 }
 
 .body-button-group {
-    display: flex; /* Display flex */
-    gap: 10px; /* Gap between buttons */
+    display: flex; 
+    gap: 10px; 
     margin: 10px;
 }
 

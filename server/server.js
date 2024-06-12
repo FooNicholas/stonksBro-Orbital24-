@@ -147,8 +147,6 @@ app.post('/reset', async (req, res) => {
     <p>If you did not request this, please ignore this email.</p>` 
   };
 
-  console.log(mailOptions);
-
   transporter.sendMail(mailOptions, (error, info) => {
     if (error) {
       console.error('Error sending email:', error);
