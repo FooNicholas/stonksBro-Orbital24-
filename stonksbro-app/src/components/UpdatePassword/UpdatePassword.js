@@ -43,7 +43,7 @@ const UpdatePassword = () => {
     }
 
     try {
-      const response = await fetch('https://stonks-bro-orbital24.vercel-server.app/update-password', {
+      const response = await fetch('https://stonks-bro-orbital24-server.vercel.app/update-password', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
