@@ -1,7 +1,10 @@
-import React, { useEffect, useRef, memo } from 'react';
+import React, { useState, useEffect, useRef, memo } from 'react';
+import './TradingViewDashboard.css';
 
-function TradingViewWidget() {
+function TradingViewDashboard() {
   const container = useRef(null);
+  const [watchlist, setWatchlist] = useState(['AAPL', 'IBM', 'TSLA', 'AMD', 'MSFT', 'GOOG']);
+  const [newSymbol, setNewSymbol] = useState('');
 
   useEffect(() => {
     if (!container.current) return;
@@ -13,6 +16,7 @@ function TradingViewWidget() {
     script.type = 'text/javascript';
     script.async = true;
     script.innerHTML = JSON.stringify({
+      watchlist: watchlist,
       autosize: true,
       width: '100%',
       height: '100%',
@@ -24,12 +28,22 @@ function TradingViewWidget() {
       withdateranges: true,
       allow_symbol_change: true,
       save_image: false,
-      watchlist: ['AAPL', 'IBM', 'TSLA', 'AMD', 'MSFT', 'GOOG'],
       support_host: 'https://www.tradingview.com',
     });
 
     container.current.appendChild(script);
-  }, []);
+  }, [watchlist]);
+
+  const addSymbol = () => {
+    if (newSymbol && !watchlist.includes(newSymbol.toUpperCase())) {
+      setWatchlist([...watchlist, newSymbol.toUpperCase()]);
+      setNewSymbol('');
+    }
+  };
+
+  const removeSymbol = (symbol) => {
+    setWatchlist(watchlist.filter(item => item !== symbol));
+  };
 
   return (
     <div
@@ -44,7 +58,7 @@ function TradingViewWidget() {
       <div className="tradingview-widget-copyright">
         <a
           href="https://www.tradingview.com/"
-          rel="noopener nofollow"
+          rel="noreferrer nofollow"
           target="_blank"
         >
           <span className="blue-text">Track all markets on TradingView</span>
@@ -54,4 +68,4 @@ function TradingViewWidget() {
   );
 }
 
-export default memo(TradingViewWidget);
+export default memo(TradingViewDashboard);
