@@ -1,0 +1,216 @@
+.header-container {
+    width: 100%;
+    background-color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: sans-serif, Arial;
+}
+
+.left-container {
+    display: flex;
+    align-items: center;
+}
+
+.logo-fixed {
+    margin: 10px;
+    margin-left: 20px;
+    width: 200px;
+    height: 50px;
+}
+.button-group-left {
+    display: flex;
+    gap: 10px;
+}
+
+.button-group-right {
+    display: flex;
+    gap: 10px;
+}
+
+.profile {
+    width: 100px;
+    height: 40px;
+    color: Black;
+    background-color: #f0f0f0;
+    border-radius: 10px;
+    font-size: 15px;
+    cursor: pointer;
+    border: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: sans-serif, Arial;
+}
+
+.dashboard, .logout, .practice {
+    width: 100px;
+    height: 40px;
+    color: black;
+    background-color: white;
+    border-radius: 10px;
+    font-size: 15px;
+    cursor: pointer;
+    border: 1px solid #ccc;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: sans-serif, Arial;
+}
+
+.logout {
+    margin-right: 20px; 
+}
+.logout-icon {
+    width: 30px;
+    height: 30px;
+}
+
+.body-container {
+    min-height: 80vh;
+    display: flex;
+    flex-direction: column;
+    background-color: white;
+    border-radius: 10px;
+    padding: 20px;
+    margin-top: 40px; 
+    margin-left: 200px;
+    margin-right: 200px;
+}
+
+.profile-info {
+    margin-left: 20px;
+    margin-top: 5px;
+    display: flex;
+    align-items: center;
+}
+
+.profile-icon {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    margin-right: 20px;
+    margin-left: 10px;
+    position: relative;
+    cursor: pointer;
+}
+
+.icon-prompt {
+    position: absolute;
+    top: 299px; 
+    left: 245px; 
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    z-index: 1;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+}
+
+.save-button {
+    padding: 10px;
+    margin-left: 10px;
+    margin-top: 10px;
+    font-size: 16px;
+    border: 1px solid Black;
+    border-radius: 5px;
+    background-color: #007bff;
+    color: white;
+    cursor: pointer;
+}
+
+.icon-option {
+    width: 100px;
+    height: 100px;
+    margin: 5px;
+    cursor: pointer;
+    border-radius: 50%;
+    border: 2px solid transparent;
+}
+
+.icon-option:hover {
+    border: 3px solid grey;
+}
+
+.icon-option.active {
+    border: 3px solid #007bff;
+}
+
+.username {
+    font-size: 40px;
+    margin-left: 20px;
+    font-family: sans-serif, Arial;
+}
+
+.contents {
+    flex: 1;
+    display: flex;
+    flex-direction: row;
+    margin: 10px;
+}
+
+.side-bar {
+    margin-left: 20px;
+    width: 150px;
+    flex-direction: column;
+
+}
+
+.side-bar button {
+    display: flex;
+    align-items: left;
+    justify-content: left;
+    background-color: lightgray;
+    margin-bottom: 5px;
+    font-size: 20px;
+    height: 60px;
+    width: 100%;
+    padding: 15px 15px;
+    cursor: pointer;
+}
+
+.side-bar button.active {
+    background-color: white;
+}
+
+.side-bar button img.button-icon {
+    margin-right: 10px;
+    width: 25px;
+    height: 25px;
+}
+.side-bar button img.button-icon-add {
+    margin-right: 10px;
+    width: 30px;
+    height: 30px;
+}
+
+.board {
+    margin-left: 50px;
+    margin-right: 20px;
+    flex: 1;
+    max-height: 550px;
+    overflow: auto;
+}
+
+
+::-webkit-scrollbar {
+width: 10px;
+}
+
+
+::-webkit-scrollbar-track {
+background: #f1f1f1;
+}
+
+
+::-webkit-scrollbar-thumb {
+background: #888;
+}
+
+
+::-webkit-scrollbar-thumb:hover {
+background: #555;
+}
+

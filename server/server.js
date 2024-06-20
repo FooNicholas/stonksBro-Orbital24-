@@ -16,7 +16,9 @@ app.use(express.static(path.join(__dirname, 'stonksbro-app', 'public')));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
-const supabaseURL = 'https://bihxlkqzfksexusydreo.supabase.co';
+const JWT_SECRET = process.env.JWT_SECRET_KEY;
+
+const supabaseURL = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_KEY;
 const supabase = createClient(supabaseURL, supabaseKey);
 
@@ -52,7 +54,9 @@ app.post('/login', async (req, res) => {
   const isPasswordValid = await bcrypt.compare(password, user.hashedPassword);
 
   if (isPasswordValid) {
-    res.status(200).send('Login successful.');
+    const token = jwt.sign({ userId: user.id, username: user.username }, JWT_SECRET, { expiresIn: '1h' });
+    res.status(200).json({ token, username: user.username, userId: user.id });
+
   } else {
     res.status(401).send('Invalid email or password.');
   }
@@ -195,6 +199,222 @@ app.post('/update-password', async (req, res) => {
   res.status(200).send('Password updated successfully.');
 });
 
+app.post('/send-friend-request', async (req, res) => {
+  const { senderId, receiverUsername } = req.body;
+
+  if (!senderId || !receiverUsername) {
+      return res.status(400).send('Sender ID and receiver username are required.');
+  }
+
+  const { data: receiver, error: receiverError } = await supabase
+      .from('users')
+      .select('id')
+      .eq('username', receiverUsername)
+      .single();  
+
+  if (receiverError || !receiver) {
+      return res.status(404).send('User not found.');
+  }
+
+  const date = new Date();
+
+  const { error: insertError } = await supabase
+      .from('friend_request')
+      .insert([{ sender_id: senderId, receiver_id: receiver.id, created_at: date }]);
+
+  if (insertError) {
+      console.error('Supabase error:', insertError.message);
+      return res.status(500).send('Internal server error.');
+  }
+
+  res.status(200).send('Friend request sent successfully.');
+});
+
+
+app.get('/friend-requests/:userId', async (req, res) => {
+  const { userId } = req.params;
+
+  try {
+    // Fetch friend requests
+    const { data: requests, error } = await supabase
+      .from('friend_request')
+      .select('id, sender_id, created_at')
+      .eq('receiver_id', userId);
+
+    if (error) {
+      console.error('Supabase error:', error.message);
+      return res.status(500).send('Internal server error.');
+    }
+
+    // Check if there are no requests
+    if (requests.length === 0) {
+      return res.status(200).json([]);
+    }
+
+    // Fetch usernames based on sender_ids
+    const senderIds = requests.map(request => request.sender_id);
+    const { data: users, error: usersError } = await supabase
+      .from('users')
+      .select('id, username')
+      .in('id', senderIds);
+
+    if (usersError) {
+      console.error('Supabase error:', usersError.message);
+      return res.status(500).send('Internal server error.');
+    }
+
+    // Map usernames to friend requests
+    const requestsWithUsernames = requests.map(request => {
+      const sender = users.find(user => user.id === request.sender_id);
+      return { ...request, sender_username: sender ? sender.username : 'Unknown' };
+    });
+
+    res.status(200).json(requestsWithUsernames);
+  } catch (error) {
+    console.error('Server error:', error);
+    res.status(500).send('Internal server error.');
+  }
+});
+
+app.post('/accept', async (req, res) => {
+  const { userId, senderId } = req.body;
+
+  try {
+    const { data: addFriend, error: addFriendError } = await supabase
+    .from('friends')
+    .insert([{user_id: userId, friends_id: senderId}, {user_id: senderId, friends_id: userId}]);
+
+    if (addFriendError) {
+      console.error('Error inserting into friends table:', addFriendError);
+      return res.status(500).send('Internal server error.');
+   }
+
+   const { data: deleteRequest, error: deleteRequestError } = await supabase
+   .from('friend_request')
+   .delete()
+   .match({receiver_id: userId, sender_id: senderId});
+
+   if (deleteRequestError) {
+    console.error('Error deleting from friend_request table:', deleteRequestError);
+    return res.status(500).send('Internal server error.');
+    }
+    
+    res.status(200).send('Friend request accepted successfully.')
+  } catch (error) {
+    console.error('Server error:', error);
+    res.status(500).send('Internal server error.');
+  }
+});
+
+app.post('/reject', async (req, res) => {
+  const { userId, senderId } = req.body;
+
+  if (!userId || !senderId) {
+    return res.status(400).send('User ID and Sender ID are required.');
+  }
+
+  try {
+    const { data: deleteRequest, error: deleteRequestError } = await supabase
+   .from('friend_request')
+   .delete()
+   .match({receiver_id: userId, sender_id: senderId});
+
+   if (deleteRequestError) {
+    console.error('Error deleting from friend_request table:', deleteRequestError);
+    return res.status(500).send('Internal server error.');
+    }
+    
+  } catch (error) {
+    console.error('Server error:', error);
+    res.status(500).send('Internal server error.');
+  }
+});
+
+app.get('/friends/:userId', async (req, res) => {
+  const { userId } = req.params;
+
+  try {
+    const { data: friends, error } = await supabase
+      .from('friends')
+      .select('friends_id')
+      .eq('user_id', userId);
+
+    if (error) {
+      console.error('Supabase error:', error.message);
+      return res.status(500).send('Internal server error.');
+    }
+    
+    const friend_id = friends.map(request => request.friends_id);
+    const { data: friendDetails, error: friendDetailsError } = await supabase
+      .from('users')
+      .select('id, username, avatar')
+      .in('id', friend_id);
+
+    if (friendDetailsError) {
+      console.error('Supabase error:', friendDetailsError.message);
+      return res.status(500).send('Internal server error.');
+    }
+
+    res.status(200).json(friendDetails);
+  } catch (error) {
+    console.error('Server error:', error);
+    res.status(500).send('Internal server error.');
+  }
+});
+
+app.get('/get-avatar/:userId', async (req, res) => {
+  const { userId } = req.params;
+  try {
+    const { data: avatar, error } = await supabase
+    .from('users')
+    .select('avatar')
+    .eq('id', userId)
+    .single();
+
+    if (error) {
+      console.error('Supabase error:', error.message);
+      return res.status(500).send('Internal server error.');
+    }
+
+    res.status(200).json(avatar);
+  } catch (error) {
+    console.error('Server error:', error);
+    res.status(500).send('Internal server error.');
+  }
+});
+
+app.post('/change-avatar', async (req, res) => {
+  const { avatar, userId } = req.body;
+
+  const fileName = avatar;
+
+  try {
+    const { data: icon, error: retrieveIconError } = supabase
+      .storage
+      .from('profile_icon')
+      .getPublicUrl(avatar);
+
+    if (retrieveIconError) {
+      console.error('Supabase error:', retrieveIconError.message);
+      return res.status(500).send('Internal server error.');
+    }
+
+    const { data: updateIcon, error: updateIconError } = await supabase
+      .from('users')
+      .update({ avatar: icon.publicUrl })
+      .eq('id', userId);
+
+    if (updateIconError) {
+      console.error('Supabase error:', updateIconError.message);
+      return res.status(500).send('Internal server error.');
+    }
+
+    res.status(200).send('Avatar updated successfully.');
+  } catch (error) {
+    console.error('Server error:', error);
+    res.status(500).send('Internal server error.');
+  }
+});
 
 app.listen(port, () => {
   console.log(`Server is running on port: ${port}`);

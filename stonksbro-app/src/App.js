@@ -7,6 +7,7 @@ import Dashboard from './components/Dashboard/Dashboard';
 import ProtectedRoute from './components/ProtectedRoute/ProtectedRoute';
 import Reset from './components/Reset/Reset'
 import UpdatePassword from './components/UpdatePassword/UpdatePassword';
+import Profile from './components/Profile/Profile'
 
 
 function App() {
@@ -26,6 +27,13 @@ function App() {
             </ProtectedRoute>
           } 
         />
+        <Route 
+          path='/profile' 
+          element={
+            <ProtectedRoute>
+            <Profile/>
+            </ProtectedRoute>
+          }/>
       </Routes>
       </AuthProvider>
     </Router>

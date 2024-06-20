@@ -1,5 +1,5 @@
   import './Login.css'
-  import { useState, createContext, useContext } from 'react';
+  import { useState } from 'react';
   import { useNavigate } from "react-router-dom";
   import { useAuth } from '../AuthContext/AuthContext';
   import MessageBox from '../MessageBox/MessageBox';
@@ -50,9 +50,9 @@
           });
   
           if (response.ok) {
-            // const { token } = await response.json(); 
+            const { token, username, userId } = await response.json();
             console.log('Login successful');
-            login(); //if token is passed as an arguement, not redirecting to /dashboard 
+            login(token, username, userId);
             navigate('/dashboard')
           } else {
             const errorText = await response.text();
