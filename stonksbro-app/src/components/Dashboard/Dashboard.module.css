@@ -1,35 +1,29 @@
-body {
-    margin: 0;
-    padding: 0;
-    font-family: sans-serif, Arial;
-    background-color: lightblue; /* Change background color of the entire page */
-}
-
-.header-container {
+.headerContainer {
     width: 100%;
-    background-color: rgb(255, 255, 255);
+    background-color: white;
     display: flex;
     justify-content: space-between;
     align-items: center;
     font-family: sans-serif, Arial;
 }
-.left-container {
+
+.leftContainer {
     display: flex;
     align-items: center;
 }
 
-.logo-fixed {
+.logoFixed {
     margin: 10px;
     margin-left: 20px;
     width: 200px;
     height: 50px;
 }
-.button-group-left {
+.buttonGroupLeft {
     display: flex;
     gap: 10px;
 }
 
-.button-group-right {
+.buttonGroupRight {
     display: flex;
     gap: 10px;
 }
@@ -37,7 +31,7 @@ body {
 .dashboard {
     width: 100px;
     height: 40px;
-    color: Black;
+    color: black;
     background-color: #f0f0f0;
     border-radius: 10px;
     font-size: 15px;
@@ -65,30 +59,26 @@ body {
 }
 
 .logout {
-    margin-right: 20px; /* Adjust spacing between buttons and right side of screen */
+    margin-right: 20px; 
 }
-.logout-icon {
+.logoutIcon {
     width: 30px;
     height: 30px;
 }
 
-.body-container {
+.bodyContainer {
     min-height: 80vh;
     display: flex;
-    flex-direction: column;
-    background-color: rgb(21,25,36);
+    flex-direction: row;
+    background-color: white;
     border-radius: 10px;
     padding: 20px;
-    margin-top: 50px;
-    margin-bottom: 50px; 
-    margin-left: 250px;
-    margin-right: 300px;
-    justify-content: center;
-    align-items: center;
-    height: calc(100vh - 200px);
+    margin-top: 40px; 
+    margin-left: 200px;
+    margin-right: 200px;
 }
 
-.body-left {
+.bodyLeft {
     flex: 1; 
     border-radius: 10px;
     margin-right: 10px; 
@@ -97,7 +87,7 @@ body {
     overflow-y: auto;
 }
 
-.search-bar {
+.searchBar {
     display: flex;
     align-items: center;
     margin-top: 10px; 
@@ -110,14 +100,14 @@ body {
     box-sizing: border-box;
 }
 
-.search-input {
-    flex: 1; /* Take up remaining space */
-    border: none; /* Remove default input border */
-    outline: none; /* Remove default input outline */
-    margin-left: 10px; /* Add some spacing between the icon and input */
+.searchInput {
+    flex: 1;
+    border: none;
+    outline: none; 
+    margin-left: 10px; 
 }
 
-.body-right {
+.bodyRight {
     flex: 1; 
     margin-left: 10px; 
     margin-right: 10px;
@@ -126,9 +116,9 @@ body {
     overflow-y: auto;
 }
 
-.body-button-group {
-    display: flex; /* Display flex */
-    gap: 10px; /* Gap between buttons */
+.bodyButtonGroup {
+    display: flex; 
+    gap: 10px; 
     margin: 10px;
 }
 
@@ -146,4 +136,3 @@ body {
     align-items: center;
     font-family: sans-serif, Arial;
 }
-

@@ -6,6 +6,9 @@ import Register from "./components/Register/Register";
 import Dashboard from './components/Dashboard/Dashboard';
 import News from './components/TradingViewWidget/TradingViewNews/TradingViewNews';
 import ProtectedRoute from './components/ProtectedRoute/ProtectedRoute';
+import Reset from './components/Reset/Reset'
+import UpdatePassword from './components/UpdatePassword/UpdatePassword';
+import Profile from './components/Profile/Profile'
 
 
 function App() {
@@ -15,6 +18,8 @@ function App() {
       <Routes>
         <Route path="/" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/reset-password" element={<Reset />} />
+        <Route path='/update-password' element={<UpdatePassword/>} />
         <Route 
           path="/dashboard" 
           element={
@@ -23,7 +28,13 @@ function App() {
             </ProtectedRoute>
           } 
         />
-        <Route path="/news" element={<News />} />
+        <Route 
+          path='/profile' 
+          element={
+            <ProtectedRoute>
+            <Profile/>
+            </ProtectedRoute>
+          }/>
       </Routes>
       </AuthProvider>
     </Router>

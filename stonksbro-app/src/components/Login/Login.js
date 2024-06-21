@@ -1,5 +1,5 @@
   import './Login.css'
-  import { useState, createContext, useContext } from 'react';
+  import { useState } from 'react';
   import { useNavigate } from "react-router-dom";
   import { useAuth } from '../AuthContext/AuthContext';
   import MessageBox from '../MessageBox/MessageBox';
@@ -16,22 +16,26 @@
     const navigateToRegister = () => {
         navigate('/register');
     };
+    const navigateToReset = () => {
+      navigate('/reset-password');
+    }
 
     const [errorMessage, setErrorMessage] = useState('');
 
     const [formData, setFormData] = useState({
         email: '',
         password: '',
-      });
-      const [error, setError] = useState('');
+    });
+      
+    const [error, setError] = useState('');
     
-      const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormData({
-          ...formData,
-          [name]: value,
-        });
-      };
+    const handleChange = (e) => {
+      const { name, value } = e.target;
+      setFormData({
+        ...formData,
+        [name]: value,
+      });
+    };
     
     const handleSubmit = async (e) => {
       e.preventDefault();
@@ -46,9 +50,9 @@
           });
   
           if (response.ok) {
-            // const { token } = await response.json(); 
+            const { token, username, userId } = await response.json();
             console.log('Login successful');
-            login(); //if token is passed as an arguement, not redirecting to /dashboard 
+            login(token, username, userId);
             navigate('/dashboard')
           } else {
             const errorText = await response.text();
@@ -107,7 +111,9 @@
                         </div>
                     </div>
                 
-                    <div className="forgot-password"> Lost Password? <span> Click Here!</span> </div>
+                    <div className="forgot-password"> 
+                      Lost Password? <span onClick={navigateToReset}> Click Here!</span> 
+                    </div>
                     
                     <div className="submit-container">
                         <button type="submit" className="submit"> Login </button>

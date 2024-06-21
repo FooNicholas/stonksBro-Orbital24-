@@ -1,0 +1,23 @@
+.friends-container {
+    padding: 0 px;
+}
+
+.friend-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    grid-gap: 20px;
+}
+
+.friend-card {
+    text-align: center;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    cursor: pointer;
+    overflow-wrap: break-word;
+}
+
+.friend-card img {
+    width: 100%;
+    border-radius: 50%;
+}
