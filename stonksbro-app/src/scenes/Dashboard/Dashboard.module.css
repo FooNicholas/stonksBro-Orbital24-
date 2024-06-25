@@ -87,26 +87,6 @@
     overflow-y: auto;
 }
 
-.searchBar {
-    display: flex;
-    align-items: center;
-    margin-top: 10px; 
-    margin-left: 20px;
-    margin-right: 20px;
-    padding: 10px;
-    border: 1px solid #ccc;
-    background-color: white;
-    border-radius: 50px;
-    box-sizing: border-box;
-}
-
-.searchInput {
-    flex: 1;
-    border: none;
-    outline: none; 
-    margin-left: 10px; 
-}
-
 .bodyRight {
     flex: 1; 
     margin-left: 10px; 
@@ -122,17 +102,19 @@
     margin: 10px;
 }
 
-.news, .graph {
-    width: 100px;
-    height: 40px;
-    color: black;
-    background-color: white;
-    border-radius: 10px;
-    font-size: 15px;
-    cursor: pointer;
-    border: 1px solid #ccc;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-family: sans-serif, Arial;
+.app,
+.content {
+  height: 100%;
+  width: 100%;
+  font-family: "Source Sans Pro", sans-serif, "Abel"
+}
+
+.app {
+  display: flex;
+  position: relative;
+}
+
+.tv-container {
+   height: 100px; 
+   width: 100px;
 }
