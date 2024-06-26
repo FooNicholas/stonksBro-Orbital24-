@@ -1,7 +1,11 @@
-import { Box, IconButton, useTheme } from "@mui/material";
 import { useContext } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../components/AuthContext/AuthContext";
 import { ColorModeContext, tokens } from "../../theme";
+
 import InputBase from "@mui/material/InputBase";
+import { Box, IconButton, useTheme } from "@mui/material";
+
 import LightModeOutlinedIcon from "@mui/icons-material/LightModeOutlined";
 import DarkModeOutlinedIcon from "@mui/icons-material/DarkModeOutlined";
 import NotificationsOutlinedIcon from "@mui/icons-material/NotificationsOutlined";
@@ -9,8 +13,7 @@ import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
 import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
 import SearchIcon from "@mui/icons-material/Search";
 import LogoutIcon from "@mui/icons-material/Logout";
-import { useAuth } from "../../components/AuthContext/AuthContext";
-import { useNavigate } from "react-router-dom";
+import TvIcon from "@mui/icons-material/Tv";
 
 const Topbar = () => {
   const theme = useTheme();
@@ -21,10 +24,13 @@ const Topbar = () => {
   const onLogout = () => {
     logout();
   };
-  const navgivateToProfile = () => {
+  const navigateToProfile = () => {
     navigate("/profile");
   };
 
+  const navigateToDashboard = () => {
+    navigate("/dashboard");
+  };
 
   return (
     <Box display="flex" justifyContent="space-between" p={2}>
@@ -49,14 +55,17 @@ const Topbar = () => {
             <LightModeOutlinedIcon />
           )}
         </IconButton>
+        <IconButton onClick={navigateToProfile}>
+          <PersonOutlinedIcon />
+        </IconButton>
+        <IconButton onClick={navigateToDashboard}>
+          <TvIcon />
+        </IconButton>
         <IconButton>
           <NotificationsOutlinedIcon />
         </IconButton>
         <IconButton>
           <SettingsOutlinedIcon />
-        </IconButton>
-        <IconButton onClick={navgivateToProfile}>
-          <PersonOutlinedIcon />
         </IconButton>
         <IconButton onClick={onLogout}>
           <LogoutIcon />

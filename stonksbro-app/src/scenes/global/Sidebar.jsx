@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Sidebar, Menu, MenuItem } from "react-pro-sidebar";
 import { Box, Icon, IconButton, Typography, useTheme } from "@mui/material";
 import { Link } from "react-router-dom";
 import { tokens } from "../../theme";
-import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
+import { useAuth } from "../../components/AuthContext/AuthContext";
+
 import ContactsOutlinedIcon from "@mui/icons-material/ContactsOutlined";
 import ReceiptOutlinedIcon from "@mui/icons-material/ReceiptOutlined";
 import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
@@ -13,23 +14,34 @@ import PieChartOutlineOutlinedIcon from "@mui/icons-material/PieChartOutlineOutl
 import TimelineOutlinedIcon from "@mui/icons-material/TimelineOutlined";
 import NewspaperIcon from "@mui/icons-material/Newspaper";
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
-import avatarIcon from "../../components/Assets/avatar/cat.png";
+import StackedLineChartIcon from "@mui/icons-material/StackedLineChart";
+import BalanceIcon from "@mui/icons-material/Balance";
+import TvIcon from "@mui/icons-material/Tv";
 
 const Item = ({ title, to, icon, selected, setSelected }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
+
   return (
-    <MenuItem
-      active={selected === title}
+    <Link
+      to={to}
       style={{
         color: colors.grey[100],
+        textDecoration: "none",
       }}
-      onClick={() => setSelected(title)}
-      icon={icon}
     >
-      <Typography>{title}</Typography>
-      <Link to={to} />
-    </MenuItem>
+      <MenuItem
+        active={selected === title}
+        style={{
+          color: colors.grey[100],
+          textDecoration: "none",
+        }}
+        onClick={() => setSelected(title)}
+        icon={icon}
+      >
+        <Typography>{title}</Typography>
+      </MenuItem>
+    </Link>
   );
 };
 
@@ -38,6 +50,35 @@ const Navbar = () => {
   const colors = tokens(theme.palette.mode);
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [selected, setSelected] = useState("Dashboard");
+  const { username, userId } = useAuth();
+  const [avatarURL, setAvatarURL] = useState("");
+
+  useEffect(() => {
+    const controller = new AbortController();
+    const { signal } = controller;
+
+    const handleGetAvatar = async () => {
+      try {
+        const response = await fetch(
+          `https://stonks-bro-orbital24-server.vercel.app/get-avatar/${userId}`,
+          { signal }
+        );
+        if (response.ok) {
+          const data = await response.json();
+          setAvatarURL(data.avatar);
+        } else {
+          console.error("Failed to fetch avatar");
+        }
+      } catch (error) {
+        if (error.name !== "AbortError") {
+          console.error("Error getting avatar:", error);
+        }
+      }
+    };
+
+    handleGetAvatar();
+    return () => controller.abort();
+  });
 
   return (
     <Box
@@ -51,9 +92,7 @@ const Navbar = () => {
         "& .pro-inner-item": {
           padding: "5px 35px 5px 20px !important",
         },
-        "& .pro-inner-item:hover": {
-          color: "#868dfb !important",
-        },
+
         "& .pro-menu-item.active": {
           color: "#6870fa !important",
         },
@@ -94,7 +133,7 @@ const Navbar = () => {
                   alt="profile-user"
                   width="100px"
                   height="100px"
-                  src={avatarIcon}
+                  src={avatarURL}
                   style={{ cursor: "pointer", borderRadius: "50%" }}
                 />
               </Box>
@@ -105,7 +144,7 @@ const Navbar = () => {
                   fontWeight="bold"
                   sx={{ m: "10px 0 0 0" }}
                 >
-                  Set Username
+                  {username}
                 </Typography>
               </Box>
             </Box>
@@ -115,7 +154,7 @@ const Navbar = () => {
             <Item
               title="Dashboard"
               to="/dashboard"
-              icon={<HomeOutlinedIcon />}
+              icon={<TvIcon />}
               selected={selected}
               setSelected={setSelected}
             />
@@ -136,14 +175,14 @@ const Navbar = () => {
             />
             <Item
               title="Friends"
-              to="/contacts"
+              //to="/contacts"
               icon={<ContactsOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
             />
             <Item
               title="Alerts"
-              to="/invoices"
+              //to="/invoices"
               icon={<ReceiptOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
@@ -158,22 +197,22 @@ const Navbar = () => {
             </Typography>
             <Item
               title="News"
-              to="/form"
+              //to="/form"
               icon={<NewspaperIcon />}
               selected={selected}
               setSelected={setSelected}
             />
             <Item
               title="Calendar"
-              to="/calendar"
+              //to="/calendar"
               icon={<CalendarTodayOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
             />
             <Item
               title="Trading Simulator"
-              to="/faq"
-              icon={<TimelineOutlinedIcon />}
+              //to="/faq"
+              icon={<BalanceIcon />}
               selected={selected}
               setSelected={setSelected}
             />
@@ -187,31 +226,32 @@ const Navbar = () => {
             </Typography>
             <Item
               title="Bar Chart"
-              to="/bar"
+              //to="/bar"
               icon={<BarChartOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
             />
             <Item
               title="Pie Chart"
-              to="/pie"
+              //to="/pie"
               icon={<PieChartOutlineOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
             />
             <Item
               title="Line Chart"
-              to="/line"
+              //to="/line"
               icon={<TimelineOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
-            /><Item
-            title="Full Chart"
-            to="/line"
-            icon={<TimelineOutlinedIcon />}
-            selected={selected}
-            setSelected={setSelected}
-          />
+            />
+            <Item
+              title="Full Chart"
+              //to="/line"
+              icon={<StackedLineChartIcon />}
+              selected={selected}
+              setSelected={setSelected}
+            />
           </Box>
         </Menu>
       </Sidebar>

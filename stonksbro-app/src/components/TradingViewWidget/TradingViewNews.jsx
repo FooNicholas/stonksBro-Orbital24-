@@ -1,7 +1,9 @@
-import React, { useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
+import { useTheme } from "@mui/material";
 
 const TradingViewNews = () => {
   const containerRef = useRef(null);
+  const theme = useTheme();
 
   useEffect(() => {
     if (containerRef.current) {
@@ -16,12 +18,12 @@ const TradingViewNews = () => {
         displayMode: "regular",
         width: "100%",
         height: "100%",
-        colorTheme: "light",
+        colorTheme: theme.palette.mode,
         locale: "en",
       });
       containerRef.current.appendChild(script);
     }
-  }, []);
+  }, [theme.palette.mode]);
 
   return (
     <div
