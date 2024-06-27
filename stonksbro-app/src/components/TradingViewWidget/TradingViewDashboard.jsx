@@ -3,6 +3,7 @@ import { Box, TextField, Button, Typography, IconButton, Dialog, DialogActions, 
 import DeleteIcon from '@mui/icons-material/Delete';
 import CloseIcon from '@mui/icons-material/Close';
 import { tokens } from '../../theme'; // Ensure you import your theme tokens
+import { useAuth } from '../AuthContext/AuthContext';
 
 function TradingViewDashboard() {
   const container = useRef(null);
@@ -11,6 +12,7 @@ function TradingViewDashboard() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
+  const { userId } = useAuth();
 
   useEffect(() => {
     if (!container.current) return;
@@ -39,18 +41,71 @@ function TradingViewDashboard() {
       support_host: 'https://www.tradingview.com',
     });
 
+    const fetchWatchlist = async () => {
+      try {
+        const response = await fetch(`http://localhost:5000/watchlist/${userId}`);
+        if (response.ok) {
+          const data = await response.json();
+          console.log(data);
+          setWatchlist(data);
+        } else {
+          console.error('Failed to fetch watchlist');
+        }
+      } catch (error) {
+        console.error('Error fetching watchlist:', error);
+      }
+    };
+    
+    fetchWatchlist();
     container.current.appendChild(script);
   }, [watchlist, theme.palette.mode]);
 
-  const addSymbol = () => {
+  const addSymbol = async () => {
     if (newSymbol && !watchlist.includes(newSymbol.toUpperCase())) {
       setWatchlist([...watchlist, newSymbol.toUpperCase()]);
+
+      try {
+        const response = await fetch(`http://localhost:5000/add-symbol`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            userId: userId,
+            newWatchlist: watchlist
+          })
+        });
+
+        if (response.ok) {
+          console.log('Success adding symbol');
+        }
+      } catch (error) {
+        console.error('Error adding symbol:', error);
+      }
       setNewSymbol('');
     }
   };
 
-  const removeSymbol = (symbol) => {
+  const removeSymbol = async (symbol) => {
     setWatchlist(watchlist.filter(item => item !== symbol));
+    try {
+      const response = await fetch(`http://localhost:5000/remove-symbol`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          userId: userId,
+          newWatchlist: watchlist
+        })
+      });
+
+      if (response.ok) {
+        console.log('Success removing symbol');
+      }
+    } catch (error) {
+      console.error('Error removing symbol:', error);
+    }
   };
 
   const handleDialogOpen = () => {

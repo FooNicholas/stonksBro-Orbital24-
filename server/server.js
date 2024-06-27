@@ -416,6 +416,68 @@ app.post('/change-avatar', async (req, res) => {
   }
 });
 
+app.get('/watchlist/:userId', async (req, res) => {
+  const { userId } = req.params;
+
+  try {
+    const { data: watchlist, error: fetchWatchlistError } = await supabase
+    .from('watchlist')
+    .select('symbol')
+    .eq('id', userId)
+    .single()
+
+    if (fetchWatchlistError) {
+      console.error('Supabase error:', fetchWatchlistError.message);
+      return res.status(500).send('Internal server error.');
+    }
+
+    res.send(200).json(watchlist);
+  } catch (error) {
+    console.error('Server error:', error);
+    res.status(500).send('Internal server error.');
+  } 
+});
+
+app.post('/add-symbol', async (req, res) => {
+  const { userId, newWatchlist } = req.body;
+
+  try {
+    const { data: updateWatchlist, error: updateWatchlistError } = await supabase
+    .from('watchlist')
+    .update({symbol: newWatchlist})
+    .eq('id', userId)
+
+    if (updateWatchlistError) {
+      console.error('Supabase error:', updateWatchlistError.message);
+      return res.status(500).send('Internal server error.')
+    }
+    res.status(200).send('Successfully added symbol to watchlist');
+  } catch (error) {
+    console.error('Server error:', error);
+    res.status(500).send('Internal server error.');
+  }
+});
+
+app.post('/remove-symbol', async (req, res) => {
+  const { userId, newWatchlist } = req.body;
+
+  try {
+    const { data: updateWatchlist, error: updateWatchlistError } = await supabase
+    .from('watchlist')
+    .update({symbol: newWatchlist})
+    .eq('id', userId)
+
+    if (updateWatchlistError) {
+      console.error('Supabase error:', updateWatchlistError.message);
+      return res.status(500).send('Internal server error.')
+    }
+    res.status(200).send('Successfully added symbol to watchlist');
+  } catch (error) {
+    console.error('Server error:', error);
+    res.status(500).send('Internal server error.');
+  }
+});
+
 app.listen(port, () => {
   console.log(`Server is running on port: ${port}`);
 });
