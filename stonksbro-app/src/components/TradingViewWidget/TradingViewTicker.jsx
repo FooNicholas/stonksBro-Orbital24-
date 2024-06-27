@@ -1,8 +1,9 @@
-import React, { useEffect, useRef, useState } from "react";
-import { Box } from "@mui/material";
+import { Box, useTheme } from "@mui/material";
+import React, { useState, useEffect, useRef } from "react";
 
-const TradingViewTicker = (symbols) => {
+const TradingViewTicker = ({ symbol }) => {
   const containerRef = useRef(null);
+  const theme = useTheme();
 
   useEffect(() => {
     if (containerRef.current) {
@@ -14,13 +15,13 @@ const TradingViewTicker = (symbols) => {
       "https://s3.tradingview.com/external-embedding/embed-widget-single-quote.js";
     script.async = true;
     script.innerHTML = JSON.stringify({
-      symbol: symbols.symbols,
+      symbol: symbol,
       width: "100%",
-      colorTheme: "light",
+      colorTheme: theme.palette.mode,
       locale: "en",
     });
     containerRef.current.appendChild(script);
-  }, [symbols]);
+  }, [symbol, theme.palette.mode]);
 
   return (
     <Box

@@ -7,12 +7,10 @@ import Sidebar from "../global/Sidebar";
 import TradingViewDashboard from "../../components/TradingViewWidget/TradingViewDashboard";
 import TradingViewNews from "../../components/TradingViewWidget/TradingViewNews";
 import TradingViewTicker from "../../components/TradingViewWidget/TradingViewTicker";
-import styles from "./Dashboard.module.css";
 import {
   Box,
   Button,
-  Icon,
-  IconButton,
+  TextField,
   Typography,
   useTheme,
   CssBaseline,
@@ -24,7 +22,28 @@ const Dashboard = () => {
   const colorTheme = useTheme();
   const colors = tokens(colorTheme.palette.mode);
   const [theme, colorMode] = useMode();
-  const [isSidebar, setIsSidebar] = useState(true);
+  const [isSidebar, setIsSidebar] = useState(true); // State to toggle sidebar
+  const [isEditing, setIsEditing] = useState(false); // State to toggle edit mode
+
+  // State for each ticker symbol
+  const [symbols, setSymbols] = useState({
+    ticker1: "FOREXCOM:SPXUSD",
+    ticker2: "FOREXCOM:NSXUSD",
+    ticker3: "BITSTAMP:BTCUSD",
+    ticker4: "FX:EURUSD",
+  });
+
+  const handleSymbolChange = (e) => {
+    const { name, value } = e.target;
+    setSymbols((prevSymbols) => ({
+      ...prevSymbols,
+      [name]: value,
+    }));
+  };
+
+  const toggleEdit = () => {
+    setIsEditing(!isEditing);
+  };
 
   return (
     <ColorModeContext.Provider value={colorMode}>
@@ -46,15 +65,19 @@ const Dashboard = () => {
                 <Box>
                   <Button
                     sx={{
-                      backgroundColor: colors.blueAccent[700],
+                      backgroundColor: colors.blueAccent[600],
                       color: colors.grey[100],
                       fontSize: "14px",
                       fontWeight: "bold",
                       padding: "10px 20px",
+                      "&:hover": {
+                        backgroundColor: colors.blueAccent[700],
+                      },
                     }}
+                    onClick={toggleEdit}
                   >
                     <AddIcon sx={{ mr: "10px" }} />
-                    Change
+                    {isEditing ? "Save" : "Change"}
                   </Button>
                 </Box>
               </Box>
@@ -67,45 +90,29 @@ const Dashboard = () => {
                 gap="20px"
               >
                 {/* ROW 1 */}
-                <Box
-                  gridColumn="span 3"
-                  backgroundColor={colors.blueAccent[700]}
-                  display="flex"
-                  alignItems="center"
-                  justifyContent="center"
-                  sx={{ height: "100%", width: "100%" }}
-                >
-                  <TradingViewTicker  symbols="FOREXCOM:SPXUSD"/>
-                </Box>
-
-                <Box
-                  gridColumn="span 3"
-                  backgroundColor={colors.blueAccent[700]}
-                  display="flex"
-                  alignItems="center"
-                  justifyContent="center"
-                >
-                  <TradingViewTicker  symbols="FOREXCOM:NSXUSD"/>
-                </Box>
-                <Box
-                  gridColumn="span 3"
-                  backgroundColor={colors.blueAccent[700]}
-                  display="flex"
-                  alignItems="center"
-                  justifyContent="center"
-                >
-                  <TradingViewTicker  symbols="BITSTAMP:BTCUSD"/>
-                </Box>
-                <Box
-                  gridColumn="span 3"
-                  backgroundColor={colors.blueAccent[700]}
-                  display="flex"
-                  alignItems="center"
-                  justifyContent="center"
-                  overflow="hidden"
-                >
-                  <TradingViewTicker  symbols="FX:EURUSD"/>
-                </Box>
+                {Object.keys(symbols).map((tickerKey, index) => (
+                  <Box
+                    key={tickerKey}
+                    gridColumn="span 3"
+                    backgroundColor={colors.blueAccent[600]}
+                    display="flex"
+                    alignItems="center"
+                    justifyContent="center"
+                    sx={{ height: "100%", width: "100%" }}
+                  >
+                    {isEditing ? (
+                      <TextField
+                        variant="outlined"
+                        value={symbols[tickerKey]}
+                        name={tickerKey}
+                        onChange={handleSymbolChange}
+                        sx={{ border: 1 }}
+                      />
+                    ) : (
+                      <TradingViewTicker symbol={symbols[tickerKey]} />
+                    )}
+                  </Box>
+                ))}
 
                 {/* ROW 2 */}
                 <Box
@@ -113,11 +120,13 @@ const Dashboard = () => {
                   gridRow="span 4"
                   backgroundColor={colors.primary[100]}
                 >
-                  <Box sx={{
-                    height: "100%",
-                    width: "100%",
-                    border: 1
-                  }}>
+                  <Box
+                    sx={{
+                      height: "100%",
+                      width: "100%",
+                      border: 1,
+                    }}
+                  >
                     <TradingViewDashboard />
                   </Box>
                 </Box>
@@ -128,7 +137,7 @@ const Dashboard = () => {
                   sx={{
                     height: "100%",
                     width: "100%",
-                    border: 1
+                    border: 1,
                   }}
                 >
                   <TradingViewNews />
@@ -139,20 +148,19 @@ const Dashboard = () => {
                 <Box
                   gridColumn="span 3"
                   gridRow="span 2"
-                  backgroundColor={colors.primary[1000]}
                   overflow="auto"
-                  sx={{ border: 1}}
+                  sx={{ border: 1 }}
                 >
                   <Box
                     display="flex"
                     justifyContent="space-between"
                     alignItems="center"
-                    borderBottom={`4px solid ${colors.primary[500]}`}
+                    borderBottom={`3px solid`}
                     colors={colors.grey[100]}
                     p="15px"
                   >
                     <Typography
-                      color={colors.grey[100]}
+                      color={colors.blueAccent[600]}
                       variant="h5"
                       fontWeight="600"
                     >
@@ -165,7 +173,7 @@ const Dashboard = () => {
                       display="flex"
                       justifyContent="space-between"
                       alignItems="center"
-                      borderBottom={`4px solid ${colors.primary[500]}`}
+                      borderBottom={`2px solid`}
                       p="15px"
                     >
                       <Box>
@@ -176,21 +184,20 @@ const Dashboard = () => {
                         >
                           {transaction.txId}
                         </Typography>
-                        <Typography color={colors.grey[100]}>
-                          {transaction.user}
-                        </Typography>
+
+                        {transaction.user}
                       </Box>
-                      <Box color={colors.grey[100]}>{transaction.date}</Box>
+                      <Box>{transaction.date}</Box>
                       <Box
                         p="5px 10px"
                         borderRadius="4px"
+                        backgroundColor={colors.blueAccent[600]}
                       >
                         ${transaction.cost}
                       </Box>
                     </Box>
                   ))}
                 </Box>
-                
               </Box>
             </Box>
           </main>
