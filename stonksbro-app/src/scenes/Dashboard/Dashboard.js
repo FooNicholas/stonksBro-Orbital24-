@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { tokens, ColorModeContext, useMode } from "../../theme";
 import { mockTransactions } from "../../data/mockData";
+import { useAuth } from "../../components/AuthContext/AuthContext";
 import Header from "../../components/Header/Header";
 import Topbar from "../global/Topbar";
 import Sidebar from "../global/Sidebar";
@@ -19,11 +20,13 @@ import {
 import AddIcon from "@mui/icons-material/Add";
 
 const Dashboard = () => {
+
   const colorTheme = useTheme();
   const colors = tokens(colorTheme.palette.mode);
   const [theme, colorMode] = useMode();
   const [isSidebar, setIsSidebar] = useState(true); // State to toggle sidebar
   const [isEditing, setIsEditing] = useState(false); // State to toggle edit mode
+  const { userId } = useAuth();
 
   // State for each ticker symbol
   const [symbols, setSymbols] = useState({
@@ -33,6 +36,26 @@ const Dashboard = () => {
     ticker4: "FX:EURUSD",
   });
 
+  useEffect(() => {
+    const fetchTickerSymbol = async () => {
+      try{
+        const response = await fetch(`http://localhost:5000/ticker/${userId}`);
+
+        if (response.ok) {
+          const data = await response.json();
+            console.log(data);
+            setSymbols(data);
+        } else {
+          console.error('Failed to fetch ticker symbols');
+        }
+      } catch (error) {
+        console.error('Error fetching ticker symbols:', error);
+      }
+    };
+
+    fetchTickerSymbol();
+  }, [symbols]);
+
   const handleSymbolChange = (e) => {
     const { name, value } = e.target;
     setSymbols((prevSymbols) => ({
@@ -41,7 +64,31 @@ const Dashboard = () => {
     }));
   };
 
+  const handleTickerChange = async () => {
+    try {
+      const response = await fetch(`http://localhost:5000/ticker/${userId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(symbols),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log('Symbols updated succesfully', data);
+      } else {
+        console.error('Failed to update ticker symbols')
+      }
+    } catch (error) {
+      console.error('Error fetching ticker symbols:', error)
+    }
+  };
+
   const toggleEdit = () => {
+    if (isEditing) {
+      handleTickerChange();
+    }
     setIsEditing(!isEditing);
   };
 

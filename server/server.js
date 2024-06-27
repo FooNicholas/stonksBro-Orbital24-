@@ -478,6 +478,50 @@ app.post('/remove-symbol', async (req, res) => {
   }
 });
 
+app.get('/ticker/:userId', async (req, res) => {
+  const { userId } = req.params;
+
+  try {
+    const { data: tickers, error: fetchTickerError } = await supabase
+    .from('watchlist')
+    .select(tickers)
+    .eq('id', userId)
+    .single()
+
+    if (fetchTickerError) {
+      console.error('Supabase error:', fetchTickerError.message)
+      return res.status(500).send('Internal server error.')
+    }
+
+    res.status(200).json(tickers)
+  } catch (error) {
+    console.error('Server error:', error);
+    res.status(500).send('Internal server error.');
+  }
+});
+
+app.put('/ticker/:userId', async (req, res) => {
+  const { userId } = req.params;
+  const { symbols } = req.body;
+
+  try {
+    const { data: tickers, error: fetchTickerError } = await supabase
+    .from('watchlist')
+    .update({tickers: symbols})
+    .eq('id', userId)
+
+    if (fetchTickerError) {
+      console.error('Supabase error:', fetchTickerError.message)
+      return res.status(500).send('Internal server error.')
+    }
+
+    res.status(200).json(tickers)
+  } catch (error) {
+    console.error('Server error:', error);
+    res.status(500).send('Internal server error.');
+  }
+});
+
 app.listen(port, () => {
   console.log(`Server is running on port: ${port}`);
 });
