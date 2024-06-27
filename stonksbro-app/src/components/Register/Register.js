@@ -1,28 +1,28 @@
-import './Register.css'
-import { useState } from 'react';
+import "./Register.css"
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import MessageBox from '../MessageBox/MessageBox';
+import MessageBox from "../MessageBox/MessageBox";
 
-import user_icon from '../Assets/person.png'
-import email_icon from '../Assets/email.png'
-import password_icon from '../Assets/password.png'
-import logo_icon from '../Assets/stonksBro-icon.png'
+import user_icon from "../Assets/person.png"
+import email_icon from "../Assets/email.png"
+import password_icon from "../Assets/password.png"
+import logo_icon from "../Assets/stonksBro-icon.png"
 
 const Register = () => {
 
     const navigate = useNavigate();
     const navigateToLogin = () => {
-    navigate('/');
+    navigate("/");
     };
 
     const [formData, setFormData] = useState({
-        username: '',
-        email: '',
-        password: '',
-        passwordConfirm: ''
+        username: "",
+        email: "",
+        password: "",
+        passwordConfirm: ""
     });
 
-    const [errorMessage, setErrorMessage] = useState('');
+    const [errorMessage, setErrorMessage] = useState("");
 
 
     const handleChange = (e) => {
@@ -47,10 +47,10 @@ const Register = () => {
         }
     
         try {
-            const response = await fetch('https://stonks-bro-orbital24-server.vercel.app/register', { 
-                method: 'POST',
+            const response = await fetch("https://stonks-bro-orbital24-server.vercel.app/register", { 
+                method: "POST",
                 headers: {
-                    'Content-Type': 'application/json',  
+                    "Content-Type": "application/json",  
                 },
                 body: JSON.stringify(formData)  
             });
@@ -62,8 +62,8 @@ const Register = () => {
                 setErrorMessage(errorText);
             }
         } catch (error) {
-            console.error('Error:', error);
-            setErrorMessage('An error occurred. Please try again.');
+            console.error("Error:", error);
+            setErrorMessage("An error occurred. Please try again.");
         }
     }
 
@@ -81,20 +81,20 @@ const Register = () => {
                 <div className="inputs">
                     <div className="input">
                         <img src={user_icon} alt="user_icon" />
-                        <input type="text" placeholder="Username" name='username' value={formData.username} onChange={handleChange}/>
+                        <input type="text" placeholder="Username" name="username" value={formData.username} onChange={handleChange}/>
                     </div> 
                     
                     <div className="input">
                         <img src={email_icon} alt="email_icon" />
-                        <input type="email" placeholder="Email" name='email' value={formData.email} onChange={handleChange}/>
+                        <input type="email" placeholder="Email" name="email" value={formData.email} onChange={handleChange}/>
                     </div>
                     <div className="input">
                         <img src={password_icon} alt="password_icon" />
-                        <input type="password" placeholder="Password" name='password' value={formData.password} onChange={handleChange}/>
+                        <input type="password" placeholder="Password" name="password" value={formData.password} onChange={handleChange}/>
                     </div>
                     <div className="input">
                         <img src={password_icon} alt="password_icon" />
-                        <input type="password" placeholder="Confirm Password" name='passwordConfirm' value={formData.passwordConfirm} onChange={handleChange}/>
+                        <input type="password" placeholder="Confirm Password" name="passwordConfirm" value={formData.passwordConfirm} onChange={handleChange}/>
                     </div>
                 </div>
 
@@ -106,7 +106,7 @@ const Register = () => {
                 <div className="login-account"> Already Have an Account? <span onClick={navigateToLogin}>Click Here to Login!</span></div>
              
             </div>
-            <MessageBox message={errorMessage} onClose={() => setErrorMessage('')} /> 
+            <MessageBox message={errorMessage} onClose={() => setErrorMessage("")} /> 
         </>
     )
 }

@@ -1,14 +1,14 @@
-import React, { useState, useEffect, useRef, memo } from 'react';
-import { Box, TextField, Button, Typography, IconButton, Dialog, DialogActions, DialogContent, DialogTitle, useTheme, Paper } from '@mui/material';
-import DeleteIcon from '@mui/icons-material/Delete';
-import CloseIcon from '@mui/icons-material/Close';
-import { tokens } from '../../theme'; // Ensure you import your theme tokens
-import { useAuth } from '../AuthContext/AuthContext';
+import React, { useState, useEffect, useRef, memo } from "react";
+import { Box, TextField, Button, Typography, IconButton, Dialog, DialogActions, DialogContent, DialogTitle, useTheme, Paper } from "@mui/material";
+import DeleteIcon from "@mui/icons-material/Delete";
+import CloseIcon from "@mui/icons-material/Close";
+import { tokens } from "../../theme"; // Ensure you import your theme tokens
+import { useAuth } from "../AuthContext/AuthContext";
 
 function TradingViewDashboard() {
   const container = useRef(null);
-  const [watchlist, setWatchlist] = useState(['AAPL', 'IBM', 'TSLA', 'AMD', 'MSFT']); //State for watchlist
-  const [newSymbol, setNewSymbol] = useState('');
+  const [watchlist, setWatchlist] = useState(["AAPL", "IBM", "TSLA", "AMD", "MSFT"]); //State for watchlist
+  const [newSymbol, setNewSymbol] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
@@ -17,28 +17,28 @@ function TradingViewDashboard() {
   useEffect(() => {
     if (!container.current) return;
 
-    container.current.innerHTML = '';
+    container.current.innerHTML = "";
 
-    const script = document.createElement('script');
-    script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js';
-    script.type = 'text/javascript';
+    const script = document.createElement("script");
+    script.src = "https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js";
+    script.type = "text/javascript";
     script.async = true;
     script.innerHTML = JSON.stringify({
       watchlist: watchlist,
       autosize: true,
-      width: '100%',
-      height: '100%',
-      symbol: 'NASDAQ:AAPL',
-      interval: 'D',
-      timezone: 'exchange',
+      width: "100%",
+      height: "100%",
+      symbol: "NASDAQ:AAPL",
+      interval: "D",
+      timezone: "exchange",
       theme: theme.palette.mode,
-      style: '1',
+      style: "1",
       withdateranges: true,
       allow_symbol_change: true,
       save_image: false,
       details: true,
       hide_side_toolbar: false,
-      support_host: 'https://www.tradingview.com',
+      support_host: "https://www.tradingview.com",
     });
 
     const fetchWatchlist = async () => {
@@ -49,10 +49,10 @@ function TradingViewDashboard() {
           console.log(data);
           setWatchlist(data);
         } else {
-          console.error('Failed to fetch watchlist');
+          console.error("Failed to fetch watchlist");
         }
       } catch (error) {
-        console.error('Error fetching watchlist:', error);
+        console.error("Error fetching watchlist:", error);
       }
     };
     
@@ -66,9 +66,9 @@ function TradingViewDashboard() {
 
       try {
         const response = await fetch(`http://localhost:5000/add-symbol`, {
-          method: 'POST',
+          method: "POST",
           headers: {
-            'Content-Type': 'application/json'
+            "Content-Type": "application/json"
           },
           body: JSON.stringify({
             userId: userId,
@@ -77,12 +77,12 @@ function TradingViewDashboard() {
         });
 
         if (response.ok) {
-          console.log('Success adding symbol');
+          console.log("Success adding symbol");
         }
       } catch (error) {
-        console.error('Error adding symbol:', error);
+        console.error("Error adding symbol:", error);
       }
-      setNewSymbol('');
+      setNewSymbol("");
     }
   };
 
@@ -90,9 +90,9 @@ function TradingViewDashboard() {
     setWatchlist(watchlist.filter(item => item !== symbol));
     try {
       const response = await fetch(`http://localhost:5000/remove-symbol`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json'
+          "Content-Type": "application/json"
         },
         body: JSON.stringify({
           userId: userId,
@@ -101,10 +101,10 @@ function TradingViewDashboard() {
       });
 
       if (response.ok) {
-        console.log('Success removing symbol');
+        console.log("Success removing symbol");
       }
     } catch (error) {
-      console.error('Error removing symbol:', error);
+      console.error("Error removing symbol:", error);
     }
   };
 
@@ -117,19 +117,19 @@ function TradingViewDashboard() {
   };
 
   return (
-    <Box sx={{ width: '100%', height: '100%', position: 'relative' }}>
+    <Box sx={{ width: "100%", height: "100%", position: "relative" }}>
       <Button
         variant="contained"
         onClick={handleDialogOpen}
         sx={{
-          position: 'absolute',
+          position: "absolute",
           top: 3,
           right: 15,
           zIndex: 1,
           backgroundColor: colors.blueAccent[600],
           color: colors.grey[100],
           fontWeight: "bold",
-          '&:hover': {
+          "&:hover": {
             backgroundColor: colors.blueAccent[700],
           },
         }}
@@ -144,7 +144,7 @@ function TradingViewDashboard() {
             aria-label="close"
             onClick={handleDialogClose}
             sx={{
-              position: 'absolute',
+              position: "absolute",
               right: 8,
               top: 8,
               color: (theme) => theme.palette.grey[500],
@@ -154,7 +154,7 @@ function TradingViewDashboard() {
           </IconButton>
         </DialogTitle>
         <DialogContent>
-          <Box sx={{ mb: 2, display: 'flex', alignItems: 'center' }}>
+          <Box sx={{ mb: 2, display: "flex", alignItems: "center" }}>
             <TextField
               label="Add Symbol"
               value={newSymbol}
@@ -177,7 +177,7 @@ function TradingViewDashboard() {
           </Box>
           <Box>
             {watchlist.map((symbol, index) => (
-              <Paper key={index} sx={{ display: 'flex', alignItems: 'center', mb: 1, p: 2 }}>
+              <Paper key={index} sx={{ display: "flex", alignItems: "center", mb: 1, p: 2 }}>
                 <Typography variant="body1" sx={{ flexGrow: 1 }}>
                   {symbol}
                 </Typography>
@@ -198,7 +198,7 @@ function TradingViewDashboard() {
       <Box
         className="tradingview-widget-container"
         ref={container}
-        sx={{ height: '500px' }}
+        sx={{ height: "500px" }}
       >
         <Box className="tradingview-widget-container__widget"></Box>
         <Box className="tradingview-widget-copyright">

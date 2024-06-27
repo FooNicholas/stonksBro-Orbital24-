@@ -46,10 +46,10 @@ const Dashboard = () => {
             console.log(data);
             setSymbols(data);
         } else {
-          console.error('Failed to fetch ticker symbols');
+          console.error("Failed to fetch ticker symbols");
         }
       } catch (error) {
-        console.error('Error fetching ticker symbols:', error);
+        console.error("Error fetching ticker symbols:", error);
       }
     };
 
@@ -67,21 +67,21 @@ const Dashboard = () => {
   const handleTickerChange = async () => {
     try {
       const response = await fetch(`http://localhost:5000/ticker/${userId}`, {
-        method: 'PUT',
+        method: "PUT",
         headers: {
-          'Content-Type': 'application/json'
+          "Content-Type": "application/json"
         },
         body: JSON.stringify(symbols),
       });
 
       if (response.ok) {
         const data = await response.json();
-        console.log('Symbols updated succesfully', data);
+        console.log("Symbols updated succesfully", data);
       } else {
-        console.error('Failed to update ticker symbols')
+        console.error("Failed to update ticker symbols")
       }
     } catch (error) {
-      console.error('Error fetching ticker symbols:', error)
+      console.error("Error fetching ticker symbols:", error)
     }
   };
 
