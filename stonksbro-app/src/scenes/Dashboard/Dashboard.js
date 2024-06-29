@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { tokens, ColorModeContext, useMode } from "../../theme";
 import { mockTransactions } from "../../data/mockData";
+import { useAuth } from "../../components/AuthContext/AuthContext";
 import Header from "../../components/Header/Header";
 import Topbar from "../global/Topbar";
 import Sidebar from "../global/Sidebar";
@@ -24,24 +25,71 @@ const Dashboard = () => {
   const [theme, colorMode] = useMode();
   const [isSidebar, setIsSidebar] = useState(true); // State to toggle sidebar
   const [isEditing, setIsEditing] = useState(false); // State to toggle edit mode
+  const { userId } = useAuth();
 
   // State for each ticker symbol
-  const [symbols, setSymbols] = useState({
-    ticker1: "FOREXCOM:SPXUSD",
-    ticker2: "FOREXCOM:NSXUSD",
-    ticker3: "BITSTAMP:BTCUSD",
-    ticker4: "FX:EURUSD",
-  });
+  const [symbols, setSymbols] = useState([]);
 
-  const handleSymbolChange = (e) => {
-    const { name, value } = e.target;
-    setSymbols((prevSymbols) => ({
-      ...prevSymbols,
-      [name]: value,
-    }));
+  useEffect(() => {
+    const fetchTickerSymbol = async () => {
+      try {
+        const response = await fetch(`https://stonks-bro-orbital24-server.vercel.app/ticker/${userId}`);
+        if (response.ok) {
+          const data = await response.json();
+          if (Array.isArray(data)) {
+            setSymbols(data);
+            console.log("Successfully fetched tickers")
+          } else {
+            console.error("Invalid data format: expected an array");
+          }
+        } else {
+          console.error("Failed to fetch ticker symbols");
+        }
+      } catch (error) {
+        console.error("Error fetching ticker symbols:", error);
+      }
+    };
+    
+    fetchTickerSymbol();
+    
+  }, [userId]);
+
+  const handleSymbolChange = (e, index) => {
+    const { value } = e.target;
+    setSymbols((prevSymbols) => {
+      const newSymbols = [...prevSymbols];
+      newSymbols[index] = value;
+      return newSymbols;
+    });
+  };
+
+  const handleTickerChange = async () => {
+    try {
+      const response = await fetch(`https://stonks-bro-orbital24-server.vercel.app/update-ticker`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          userId: userId,
+          symbols: symbols,
+        }),
+      });
+
+      if (response.ok) {
+        console.log("successfully updated tickers ");
+      } else {
+        console.error("Failed to update ticker symbols");
+      }
+    } catch (error) {
+      console.error("Error updating ticker symbols:", error);
+    }
   };
 
   const toggleEdit = () => {
+    if (isEditing) {
+      handleTickerChange();
+    }
     setIsEditing(!isEditing);
   };
 
@@ -90,9 +138,9 @@ const Dashboard = () => {
                 gap="20px"
               >
                 {/* ROW 1 */}
-                {Object.keys(symbols).map((tickerKey, index) => (
+                {symbols.map((symbol, index) => (
                   <Box
-                    key={tickerKey}
+                    key={index}
                     gridColumn="span 3"
                     backgroundColor={colors.blueAccent[600]}
                     display="flex"
@@ -103,13 +151,12 @@ const Dashboard = () => {
                     {isEditing ? (
                       <TextField
                         variant="outlined"
-                        value={symbols[tickerKey]}
-                        name={tickerKey}
-                        onChange={handleSymbolChange}
+                        value={symbol}
+                        onChange={(e) => handleSymbolChange(e, index)}
                         sx={{ border: 1 }}
                       />
                     ) : (
-                      <TradingViewTicker symbol={symbols[tickerKey]} />
+                      <TradingViewTicker symbol={symbols[index]} />
                     )}
                   </Box>
                 ))}

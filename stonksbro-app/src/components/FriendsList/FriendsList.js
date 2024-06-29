@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { useAuth } from '../AuthContext/AuthContext';
-import './FriendsList.css';
+import React, { useState, useEffect } from "react";
+import { useAuth } from "../AuthContext/AuthContext";
+import "./FriendsList.css";
 
 const Friends = () => {
     const [friends, setFriends] = useState([]);
@@ -15,10 +15,10 @@ const Friends = () => {
                     setFriends(data);
                     console.log(data);
                 } else {
-                    console.error('Failed to fetch friends');
+                    console.error("Failed to fetch friends");
                 }
             } catch (error) {
-                console.error('Error fetching friends:', error);
+                console.error("Error fetching friends:", error);
             }
         };
 

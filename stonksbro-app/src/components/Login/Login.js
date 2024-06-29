@@ -127,7 +127,7 @@ const Login = () => {
         </form>
 
         <div className="create-account">
-          Don't have an account?{" "}
+          Don"t have an account?{" "}
           <span onClick={navigateToRegister}> Click Here to Register! </span>
         </div>
       </div>

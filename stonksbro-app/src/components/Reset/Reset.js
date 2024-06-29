@@ -1,24 +1,24 @@
-import './Reset.css'
-import { useState } from 'react';
+import "./Reset.css"
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import MessageBox from '../MessageBox/MessageBox';
+import MessageBox from "../MessageBox/MessageBox";
 
-import email_icon from '../Assets/email.png'
-import password_icon from '../Assets/password.png'
-import logo_icon from '../Assets/stonksBro-icon.png'
+import email_icon from "../Assets/email.png"
+import password_icon from "../Assets/password.png"
+import logo_icon from "../Assets/stonksBro-icon.png"
 
 const Reset = () => {
     
-    const [errorMessage, setErrorMessage] = useState('');
-    const [successMessage, setSuccessMessage] = useState('');
+    const [errorMessage, setErrorMessage] = useState("");
+    const [successMessage, setSuccessMessage] = useState("");
 
     const navigate = useNavigate();
         const navigateToLogin = () => {
-        navigate('/');
+        navigate("/");
     };
 
     const [formData, setFormData] = useState({
-        email: ''
+        email: ""
     });
     
     const handleChange = (e) => {
@@ -32,31 +32,31 @@ const Reset = () => {
     const handlePasswordReset = async (e) => {
         e.preventDefault();
         if (!formData.email) {
-          setErrorMessage('Please enter your email address.');
+          setErrorMessage("Please enter your email address.");
           return;
         }
     
         try {
-          const response = await fetch('https://stonks-bro-orbital24-server.vercel.app/reset', {
-            method: 'POST',
+          const response = await fetch("https://stonks-bro-orbital24-server.vercel.app/reset", {
+            method: "POST",
             headers: {
-              'Content-Type': 'application/json',
+              "Content-Type": "application/json",
             },
             body: JSON.stringify(formData),
           });
     
           if (response.ok) {
-            setSuccessMessage('Password reset email sent.');
-            setErrorMessage('');
+            setSuccessMessage("Password reset email sent.");
+            setErrorMessage("");
           } else {
             const errorText = await response.text();
             setErrorMessage(errorText);
-            setSuccessMessage('');
+            setSuccessMessage("");
           }
         } catch (error) {
-          console.error('Error:', error);
-          setErrorMessage('An error occurred. Please try again.');
-          setSuccessMessage('');
+          console.error("Error:", error);
+          setErrorMessage("An error occurred. Please try again.");
+          setSuccessMessage("");
         }
       };
     
@@ -94,8 +94,8 @@ const Reset = () => {
             </div>
 
           </div>
-          {errorMessage && <MessageBox message={errorMessage} onClose={() => setErrorMessage('')} />}
-          {successMessage && <MessageBox message={successMessage} onClose={() => setSuccessMessage('')} />}
+          {errorMessage && <MessageBox message={errorMessage} onClose={() => setErrorMessage("")} />}
+          {successMessage && <MessageBox message={successMessage} onClose={() => setSuccessMessage("")} />}
       </>
   )
 }

@@ -1,56 +1,120 @@
-import React, { useState, useEffect, useRef, memo } from 'react';
-import { Box, TextField, Button, Typography, IconButton, Dialog, DialogActions, DialogContent, DialogTitle, useTheme, Paper } from '@mui/material';
-import DeleteIcon from '@mui/icons-material/Delete';
-import CloseIcon from '@mui/icons-material/Close';
-import { tokens } from '../../theme'; // Ensure you import your theme tokens
+import React, { useState, useEffect, useRef, memo } from "react";
+import { Box, TextField, Button, Typography, IconButton, Dialog, DialogActions, DialogContent, DialogTitle, useTheme, Paper } from "@mui/material";
+import DeleteIcon from "@mui/icons-material/Delete";
+import CloseIcon from "@mui/icons-material/Close";
+import { tokens } from "../../theme";
+import { useAuth } from "../AuthContext/AuthContext";
+import { Link } from 'react-router-dom';
 
 function TradingViewDashboard() {
   const container = useRef(null);
-  const [watchlist, setWatchlist] = useState(['AAPL', 'IBM', 'TSLA', 'AMD', 'MSFT']); //State for watchlist
-  const [newSymbol, setNewSymbol] = useState('');
+  const [watchlist, setWatchlist] = useState([]);
+  const [newSymbol, setNewSymbol] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
+  const { userId } = useAuth();
 
   useEffect(() => {
     if (!container.current) return;
 
-    container.current.innerHTML = '';
+    container.current.innerHTML = "";
 
-    const script = document.createElement('script');
-    script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js';
-    script.type = 'text/javascript';
+    const script = document.createElement("script");
+    script.src = "https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js";
+    script.type = "text/javascript";
     script.async = true;
     script.innerHTML = JSON.stringify({
       watchlist: watchlist,
       autosize: true,
-      width: '100%',
-      height: '100%',
-      symbol: 'NASDAQ:AAPL',
-      interval: 'D',
-      timezone: 'exchange',
+      width: "100%",
+      height: "100%",
+      symbol: "NASDAQ:AAPL",
+      interval: "D",
+      timezone: "exchange",
       theme: theme.palette.mode,
-      style: '1',
+      style: "1",
       withdateranges: true,
       allow_symbol_change: true,
       save_image: false,
       details: true,
       hide_side_toolbar: false,
-      support_host: 'https://www.tradingview.com',
+      support_host: "https://www.tradingview.com",
     });
 
     container.current.appendChild(script);
   }, [watchlist, theme.palette.mode]);
 
-  const addSymbol = () => {
+  useEffect(() => {
+    const fetchWatchlist = async () => {
+      try {
+        const response = await fetch(`https://stonks-bro-orbital24-server.vercel.app/watchlist/${userId}`);
+        if (response.ok) {
+          const data = await response.json();
+          if (Array.isArray(data)) {
+            setWatchlist(data);
+          } else {
+            console.error("Invalid data format: expected an array");
+          }
+        } else {
+          console.error("Failed to fetch watchlist");
+        }
+      } catch (error) {
+        console.error("Error fetching watchlist:", error);
+      }
+    };
+
+    fetchWatchlist();
+  }, [userId]);
+
+  const addSymbol = async () => {
     if (newSymbol && !watchlist.includes(newSymbol.toUpperCase())) {
       setWatchlist([...watchlist, newSymbol.toUpperCase()]);
-      setNewSymbol('');
+
+      try {
+        const response = await fetch(`https://stonks-bro-orbital24-server.vercel.app/add-symbol`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            userId: userId,
+            newWatchlist: [...watchlist, newSymbol.toUpperCase()]
+          })
+        });
+
+        if (response.ok) {
+          console.log("Success adding symbol to watchlist");
+        }
+      } catch (error) {
+        console.error("Error adding symbol to watchlist:", error);
+      }
+      setNewSymbol("");
     }
   };
 
-  const removeSymbol = (symbol) => {
-    setWatchlist(watchlist.filter(item => item !== symbol));
+  const removeSymbol = async (symbol) => {
+    const updatedWatchlist = watchlist.filter(item => item !== symbol);
+    setWatchlist(updatedWatchlist);
+
+    try {
+      const response = await fetch(`https://stonks-bro-orbital24-server.vercel.app/remove-symbol`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          userId: userId,
+          newWatchlist: updatedWatchlist
+        })
+      });
+
+      if (response.ok) {
+        console.log("Success removing symbol in watchlist");
+      }
+    } catch (error) {
+      console.error("Error removing symbol in watchlist:", error);
+    }
   };
 
   const handleDialogOpen = () => {
@@ -62,19 +126,19 @@ function TradingViewDashboard() {
   };
 
   return (
-    <Box sx={{ width: '100%', height: '100%', position: 'relative' }}>
+    <Box sx={{ width: "100%", height: "100%", position: "relative" }}>
       <Button
         variant="contained"
         onClick={handleDialogOpen}
         sx={{
-          position: 'absolute',
+          position: "absolute",
           top: 3,
           right: 15,
           zIndex: 1,
           backgroundColor: colors.blueAccent[600],
           color: colors.grey[100],
           fontWeight: "bold",
-          '&:hover': {
+          "&:hover": {
             backgroundColor: colors.blueAccent[700],
           },
         }}
@@ -89,7 +153,7 @@ function TradingViewDashboard() {
             aria-label="close"
             onClick={handleDialogClose}
             sx={{
-              position: 'absolute',
+              position: "absolute",
               right: 8,
               top: 8,
               color: (theme) => theme.palette.grey[500],
@@ -99,7 +163,7 @@ function TradingViewDashboard() {
           </IconButton>
         </DialogTitle>
         <DialogContent>
-          <Box sx={{ mb: 2, display: 'flex', alignItems: 'center' }}>
+          <Box sx={{ mb: 2, display: "flex", alignItems: "center" }}>
             <TextField
               label="Add Symbol"
               value={newSymbol}
@@ -122,7 +186,7 @@ function TradingViewDashboard() {
           </Box>
           <Box>
             {watchlist.map((symbol, index) => (
-              <Paper key={index} sx={{ display: 'flex', alignItems: 'center', mb: 1, p: 2 }}>
+              <Paper key={index} sx={{ display: "flex", alignItems: "center", mb: 1, p: 2 }}>
                 <Typography variant="body1" sx={{ flexGrow: 1 }}>
                   {symbol}
                 </Typography>
@@ -143,7 +207,7 @@ function TradingViewDashboard() {
       <Box
         className="tradingview-widget-container"
         ref={container}
-        sx={{ height: '500px' }}
+        sx={{ height: "500px" }}
       >
         <Box className="tradingview-widget-container__widget"></Box>
         <Box className="tradingview-widget-copyright">
@@ -152,6 +216,7 @@ function TradingViewDashboard() {
             rel="noreferrer nofollow"
             target="_blank"
           >
+            TradingView
           </a>
         </Box>
       </Box>

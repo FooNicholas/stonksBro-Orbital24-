@@ -1,4 +1,4 @@
-import './MessageBox.css';
+import "./MessageBox.css";
 
 const MessageBox = ({ message, onClose }) => {
     if (!message) return null;
