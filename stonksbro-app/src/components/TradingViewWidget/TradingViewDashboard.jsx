@@ -4,7 +4,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import CloseIcon from "@mui/icons-material/Close";
 import { tokens } from "../../theme";
 import { useAuth } from "../AuthContext/AuthContext";
-import { Link } from 'react-router-dom'; // Ensure proper usage of Link
+import { Link } from 'react-router-dom';
 
 function TradingViewDashboard() {
   const container = useRef(null);
@@ -48,7 +48,7 @@ function TradingViewDashboard() {
   useEffect(() => {
     const fetchWatchlist = async () => {
       try {
-        const response = await fetch(`http://localhost:5000/watchlist/${userId}`);
+        const response = await fetch(`https://stonks-bro-orbital24-server.vercel.app/watchlist/${userId}`);
         if (response.ok) {
           const data = await response.json();
           if (Array.isArray(data)) {
@@ -72,7 +72,7 @@ function TradingViewDashboard() {
       setWatchlist([...watchlist, newSymbol.toUpperCase()]);
 
       try {
-        const response = await fetch(`http://localhost:5000/add-symbol`, {
+        const response = await fetch(`https://stonks-bro-orbital24-server.vercel.app/add-symbol`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json"
@@ -98,7 +98,7 @@ function TradingViewDashboard() {
     setWatchlist(updatedWatchlist);
 
     try {
-      const response = await fetch(`http://localhost:5000/remove-symbol`, {
+      const response = await fetch(`https://stonks-bro-orbital24-server.vercel.app/remove-symbol`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"

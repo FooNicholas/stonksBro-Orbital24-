@@ -33,7 +33,7 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchTickerSymbol = async () => {
       try {
-        const response = await fetch(`http://localhost:5000/ticker/${userId}`);
+        const response = await fetch(`https://stonks-bro-orbital24-server.vercel.app/ticker/${userId}`);
         if (response.ok) {
           const data = await response.json();
           if (Array.isArray(data)) {
@@ -65,7 +65,7 @@ const Dashboard = () => {
 
   const handleTickerChange = async () => {
     try {
-      const response = await fetch(`http://localhost:5000/update-ticker`, {
+      const response = await fetch(`https://stonks-bro-orbital24-server.vercel.app/update-ticker`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
