@@ -2,12 +2,13 @@ import React, { useState, useEffect, useRef, memo } from "react";
 import { Box, TextField, Button, Typography, IconButton, Dialog, DialogActions, DialogContent, DialogTitle, useTheme, Paper } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import CloseIcon from "@mui/icons-material/Close";
-import { tokens } from "../../theme"; // Ensure you import your theme tokens
+import { tokens } from "../../theme";
 import { useAuth } from "../AuthContext/AuthContext";
+import { Link } from 'react-router-dom'; // Ensure proper usage of Link
 
 function TradingViewDashboard() {
   const container = useRef(null);
-  const [watchlist, setWatchlist] = useState(["AAPL", "IBM", "TSLA", "AMD", "MSFT"]); //State for watchlist
+  const [watchlist, setWatchlist] = useState([]);
   const [newSymbol, setNewSymbol] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const theme = useTheme();
@@ -41,13 +42,20 @@ function TradingViewDashboard() {
       support_host: "https://www.tradingview.com",
     });
 
+    container.current.appendChild(script);
+  }, [watchlist, theme.palette.mode]);
+
+  useEffect(() => {
     const fetchWatchlist = async () => {
       try {
         const response = await fetch(`http://localhost:5000/watchlist/${userId}`);
         if (response.ok) {
           const data = await response.json();
-          console.log(data);
-          setWatchlist(data);
+          if (Array.isArray(data)) {
+            setWatchlist(data);
+          } else {
+            console.error("Invalid data format: expected an array");
+          }
         } else {
           console.error("Failed to fetch watchlist");
         }
@@ -55,10 +63,9 @@ function TradingViewDashboard() {
         console.error("Error fetching watchlist:", error);
       }
     };
-    
+
     fetchWatchlist();
-    container.current.appendChild(script);
-  }, [watchlist, theme.palette.mode]);
+  }, [userId]);
 
   const addSymbol = async () => {
     if (newSymbol && !watchlist.includes(newSymbol.toUpperCase())) {
@@ -72,22 +79,24 @@ function TradingViewDashboard() {
           },
           body: JSON.stringify({
             userId: userId,
-            newWatchlist: watchlist
+            newWatchlist: [...watchlist, newSymbol.toUpperCase()]
           })
         });
 
         if (response.ok) {
-          console.log("Success adding symbol");
+          console.log("Success adding symbol to watchlist");
         }
       } catch (error) {
-        console.error("Error adding symbol:", error);
+        console.error("Error adding symbol to watchlist:", error);
       }
       setNewSymbol("");
     }
   };
 
   const removeSymbol = async (symbol) => {
-    setWatchlist(watchlist.filter(item => item !== symbol));
+    const updatedWatchlist = watchlist.filter(item => item !== symbol);
+    setWatchlist(updatedWatchlist);
+
     try {
       const response = await fetch(`http://localhost:5000/remove-symbol`, {
         method: "POST",
@@ -96,15 +105,15 @@ function TradingViewDashboard() {
         },
         body: JSON.stringify({
           userId: userId,
-          newWatchlist: watchlist
+          newWatchlist: updatedWatchlist
         })
       });
 
       if (response.ok) {
-        console.log("Success removing symbol");
+        console.log("Success removing symbol in watchlist");
       }
     } catch (error) {
-      console.error("Error removing symbol:", error);
+      console.error("Error removing symbol in watchlist:", error);
     }
   };
 
@@ -207,6 +216,7 @@ function TradingViewDashboard() {
             rel="noreferrer nofollow"
             target="_blank"
           >
+            TradingView
           </a>
         </Box>
       </Box>

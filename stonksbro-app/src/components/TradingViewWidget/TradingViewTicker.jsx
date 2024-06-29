@@ -6,13 +6,13 @@ const TradingViewTicker = ({ symbol }) => {
   const theme = useTheme();
 
   useEffect(() => {
-    if (containerRef.current) {
-      containerRef.current.innerHTML = "";
-    }
+    if (!containerRef.current) return;
+
+    containerRef.current.innerHTML = "";
 
     const script = document.createElement("script");
-    script.src =
-      "https://s3.tradingview.com/external-embedding/embed-widget-single-quote.js";
+    script.src = "https://s3.tradingview.com/external-embedding/embed-widget-single-quote.js";
+    script.type = "text/javascript";
     script.async = true;
     script.innerHTML = JSON.stringify({
       symbol: symbol,

@@ -20,7 +20,6 @@ import {
 import AddIcon from "@mui/icons-material/Add";
 
 const Dashboard = () => {
-
   const colorTheme = useTheme();
   const colors = tokens(colorTheme.palette.mode);
   const [theme, colorMode] = useMode();
@@ -29,22 +28,20 @@ const Dashboard = () => {
   const { userId } = useAuth();
 
   // State for each ticker symbol
-  const [symbols, setSymbols] = useState({
-    ticker1: "FOREXCOM:SPXUSD",
-    ticker2: "FOREXCOM:NSXUSD",
-    ticker3: "BITSTAMP:BTCUSD",
-    ticker4: "FX:EURUSD",
-  });
+  const [symbols, setSymbols] = useState([]);
 
   useEffect(() => {
     const fetchTickerSymbol = async () => {
-      try{
+      try {
         const response = await fetch(`http://localhost:5000/ticker/${userId}`);
-
         if (response.ok) {
           const data = await response.json();
-            console.log(data);
+          if (Array.isArray(data)) {
             setSymbols(data);
+            console.log("Successfully fetched tickers")
+          } else {
+            console.error("Invalid data format: expected an array");
+          }
         } else {
           console.error("Failed to fetch ticker symbols");
         }
@@ -52,36 +49,40 @@ const Dashboard = () => {
         console.error("Error fetching ticker symbols:", error);
       }
     };
-
+    
     fetchTickerSymbol();
-  }, [symbols]);
+    
+  }, [userId]);
 
-  const handleSymbolChange = (e) => {
-    const { name, value } = e.target;
-    setSymbols((prevSymbols) => ({
-      ...prevSymbols,
-      [name]: value,
-    }));
+  const handleSymbolChange = (e, index) => {
+    const { value } = e.target;
+    setSymbols((prevSymbols) => {
+      const newSymbols = [...prevSymbols];
+      newSymbols[index] = value;
+      return newSymbols;
+    });
   };
 
   const handleTickerChange = async () => {
     try {
-      const response = await fetch(`http://localhost:5000/ticker/${userId}`, {
-        method: "PUT",
+      const response = await fetch(`http://localhost:5000/update-ticker`, {
+        method: "POST",
         headers: {
           "Content-Type": "application/json"
         },
-        body: JSON.stringify(symbols),
+        body: JSON.stringify({
+          userId: userId,
+          symbols: symbols,
+        }),
       });
 
       if (response.ok) {
-        const data = await response.json();
-        console.log("Symbols updated succesfully", data);
+        console.log("successfully updated tickers ");
       } else {
-        console.error("Failed to update ticker symbols")
+        console.error("Failed to update ticker symbols");
       }
     } catch (error) {
-      console.error("Error fetching ticker symbols:", error)
+      console.error("Error updating ticker symbols:", error);
     }
   };
 
@@ -137,9 +138,9 @@ const Dashboard = () => {
                 gap="20px"
               >
                 {/* ROW 1 */}
-                {Object.keys(symbols).map((tickerKey, index) => (
+                {symbols.map((symbol, index) => (
                   <Box
-                    key={tickerKey}
+                    key={index}
                     gridColumn="span 3"
                     backgroundColor={colors.blueAccent[600]}
                     display="flex"
@@ -150,13 +151,12 @@ const Dashboard = () => {
                     {isEditing ? (
                       <TextField
                         variant="outlined"
-                        value={symbols[tickerKey]}
-                        name={tickerKey}
-                        onChange={handleSymbolChange}
+                        value={symbol}
+                        onChange={(e) => handleSymbolChange(e, index)}
                         sx={{ border: 1 }}
                       />
                     ) : (
-                      <TradingViewTicker symbol={symbols[tickerKey]} />
+                      <TradingViewTicker symbol={symbols[index]} />
                     )}
                   </Box>
                 ))}

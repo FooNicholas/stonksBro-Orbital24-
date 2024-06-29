@@ -420,9 +420,9 @@ app.get("/watchlist/:userId", async (req, res) => {
   const { userId } = req.params;
 
   try {
-    const { data: watchlist, error: fetchWatchlistError } = await supabase
-    .from("watchlist")
-    .select("symbol")
+    const { data: watchlistData, error: fetchWatchlistError } = await supabase
+    .from("users")
+    .select("watchlist")
     .eq("id", userId)
     .single()
 
@@ -431,7 +431,7 @@ app.get("/watchlist/:userId", async (req, res) => {
       return res.status(500).send("Internal server error.");
     }
 
-    res.send(200).json(watchlist);
+    res.status(200).json(watchlistData.watchlist);
   } catch (error) {
     console.error("Server error:", error);
     res.status(500).send("Internal server error.");
@@ -443,8 +443,8 @@ app.post("/add-symbol", async (req, res) => {
 
   try {
     const { data: updateWatchlist, error: updateWatchlistError } = await supabase
-    .from("watchlist")
-    .update({symbol: newWatchlist})
+    .from("users")
+    .update({watchlist: newWatchlist})
     .eq("id", userId)
 
     if (updateWatchlistError) {
@@ -463,8 +463,8 @@ app.post("/remove-symbol", async (req, res) => {
 
   try {
     const { data: updateWatchlist, error: updateWatchlistError } = await supabase
-    .from("watchlist")
-    .update({symbol: newWatchlist})
+    .from("users")
+    .update({watchlist: newWatchlist})
     .eq("id", userId)
 
     if (updateWatchlistError) {
@@ -483,8 +483,8 @@ app.get("/ticker/:userId", async (req, res) => {
 
   try {
     const { data: tickers, error: fetchTickerError } = await supabase
-    .from("watchlist")
-    .select(tickers)
+    .from("users")
+    .select("ticker")
     .eq("id", userId)
     .single()
 
@@ -493,21 +493,20 @@ app.get("/ticker/:userId", async (req, res) => {
       return res.status(500).send("Internal server error.")
     }
 
-    res.status(200).json(tickers)
+    res.status(200).json(tickers.ticker)
   } catch (error) {
     console.error("Server error:", error);
     res.status(500).send("Internal server error.");
   }
 });
 
-app.put("/ticker/:userId", async (req, res) => {
-  const { userId } = req.params;
-  const { symbols } = req.body;
+app.post("/update-ticker", async (req, res) => {
+  const { userId, symbols } = req.body;
 
   try {
-    const { data: tickers, error: fetchTickerError } = await supabase
-    .from("watchlist")
-    .update({tickers: symbols})
+    const { data: tickersData, error: fetchTickerError } = await supabase
+    .from("users")
+    .update({ticker: symbols})
     .eq("id", userId)
 
     if (fetchTickerError) {
@@ -515,7 +514,7 @@ app.put("/ticker/:userId", async (req, res) => {
       return res.status(500).send("Internal server error.")
     }
 
-    res.status(200).json(tickers)
+    res.status(200).send("Success")
   } catch (error) {
     console.error("Server error:", error);
     res.status(500).send("Internal server error.");
