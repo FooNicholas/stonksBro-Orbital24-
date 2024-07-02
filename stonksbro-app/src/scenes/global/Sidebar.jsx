@@ -83,6 +83,8 @@ const Navbar = () => {
   return (
     <Box
       sx={{
+        height: "100vh",
+        display: "flex",
         "& .pro-sidebar-inner": {
           background: `${colors.primary[400]} !important`,
         },
@@ -175,14 +177,14 @@ const Navbar = () => {
             />
             <Item
               title="Friends"
-              //to="/contacts"
+              to="/friends"
               icon={<ContactsOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
             />
             <Item
               title="Alerts"
-              //to="/invoices"
+              to="/add"
               icon={<ReceiptOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
@@ -217,7 +219,7 @@ const Navbar = () => {
               setSelected={setSelected}
             />
 
-            <Typography
+            {/* <Typography
               variant="h6"
               color={colors.grey[500]}
               sx={{ m: "15px 0 5px 20px" }}
@@ -251,7 +253,7 @@ const Navbar = () => {
               icon={<StackedLineChartIcon />}
               selected={selected}
               setSelected={setSelected}
-            />
+            /> */}
           </Box>
         </Menu>
       </Sidebar>

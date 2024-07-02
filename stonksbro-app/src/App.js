@@ -7,6 +7,8 @@ import ProtectedRoute from "./components/ProtectedRoute/ProtectedRoute";
 import Reset from "./components/Reset/Reset";
 import UpdatePassword from "./components/UpdatePassword/UpdatePassword";
 import Profile from "./components/Profile/Profile";
+import Friends from "./components/FriendsList/FriendsList";
+import AddFriends from "./components/AddFriends/AddFriends";
 
 import "./index.css";
 
@@ -35,6 +37,23 @@ function App() {
               </ProtectedRoute>
             }
           />
+          <Route 
+            path="/friends"
+            element={
+              <ProtectedRoute>
+                <Friends />
+              </ProtectedRoute>
+            }
+          />
+          <Route 
+            path="/add"
+            element={
+              <ProtectedRoute>
+                <AddFriends />
+              </ProtectedRoute>
+            }
+          />
+
         </Routes>
       </AuthProvider>
     </Router>
