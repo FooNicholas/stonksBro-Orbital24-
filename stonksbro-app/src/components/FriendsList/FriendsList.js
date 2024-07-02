@@ -87,7 +87,7 @@ const Friends = () => {
                           marginBottom: "10px",
                         }}
                       />
-                      <Typography variant="h4" component="div">
+                      <Typography variant="h4">
                         {friend.username}
                       </Typography>
                     </Box>
