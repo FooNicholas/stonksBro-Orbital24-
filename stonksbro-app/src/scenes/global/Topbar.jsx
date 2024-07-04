@@ -40,7 +40,7 @@ const Topbar = () => {
     };
 
     fetchNotifications();
-  }, [userId]);
+  }, [notifications]);
 
 
   const onLogout = () => {

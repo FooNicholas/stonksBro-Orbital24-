@@ -41,7 +41,6 @@ const AddFriends = () => {
         );
         if (response.ok) {
           const data = await response.json();
-          console.log(data);
           setFriendRequests(data);
         } else {
           console.error("Failed to fetch friend requests");
@@ -52,7 +51,7 @@ const AddFriends = () => {
     };
 
     fetchFriendRequests();
-  });
+  }, [friendRequests]);
 
   const handleSearch = (e) => {
     setSearchQuery(e.target.value);
@@ -176,7 +175,7 @@ const AddFriends = () => {
                     fullWidth
                     margin="normal"
                   />
-                  <Button
+                  <Button type="submit"
                     sx={{
                       backgroundColor: colors.blueAccent[600],
                       color: colors.grey[100],
