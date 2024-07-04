@@ -8,7 +8,6 @@ import { useAuth } from "../../components/AuthContext/AuthContext";
 import ContactsOutlinedIcon from "@mui/icons-material/ContactsOutlined";
 import ReceiptOutlinedIcon from "@mui/icons-material/ReceiptOutlined";
 import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
-import PersonAddAltOutlinedIcon from '@mui/icons-material/PersonAddAltOutlined';
 import CalendarTodayOutlinedIcon from "@mui/icons-material/CalendarTodayOutlined";
 import BarChartOutlinedIcon from "@mui/icons-material/BarChartOutlined";
 import PieChartOutlineOutlinedIcon from "@mui/icons-material/PieChartOutlineOutlined";
@@ -84,8 +83,6 @@ const Navbar = () => {
   return (
     <Box
       sx={{
-        height: "100vh",
-        display: "flex",
         "& .pro-sidebar-inner": {
           background: `${colors.primary[400]} !important`,
         },
@@ -178,15 +175,15 @@ const Navbar = () => {
             />
             <Item
               title="Friends"
-              to="/friends"
+              //to="/contacts"
               icon={<ContactsOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
             />
             <Item
-              title="Add"
-              to="/add"
-              icon={<PersonAddAltOutlinedIcon />}
+              title="Alerts"
+              //to="/invoices"
+              icon={<ReceiptOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
             />
@@ -220,7 +217,7 @@ const Navbar = () => {
               setSelected={setSelected}
             />
 
-            {/* <Typography
+            <Typography
               variant="h6"
               color={colors.grey[500]}
               sx={{ m: "15px 0 5px 20px" }}
@@ -254,7 +251,7 @@ const Navbar = () => {
               icon={<StackedLineChartIcon />}
               selected={selected}
               setSelected={setSelected}
-            /> */}
+            />
           </Box>
         </Menu>
       </Sidebar>
