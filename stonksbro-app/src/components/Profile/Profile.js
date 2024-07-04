@@ -36,7 +36,7 @@ const Profile = () => {
   const colorTheme = useTheme();
   const colors = colorTheme.palette;
   const [theme, colorMode] = useMode();
-  const { username, userId } = useAuth();
+  const { logout, username, userId } = useAuth();
   const [avatarURL, setAvatarURL] = useState("");
   const [isIconPromptVisible, setIconPromptVisible] = useState(false);
   const [selectedSection, setSelectedSection] = useState("portfolio");
@@ -101,6 +101,19 @@ const Profile = () => {
       }
     } catch (error) {
       console.error("Error changing avatar:", error);
+    }
+  };
+
+  const renderBoardContent = () => {
+    switch (selectedSection) {
+      case "portfolio":
+        return <ComingSoon />;
+      case "friends":
+        return <Friends />;
+      case "add":
+        return <Add />;
+      default:
+        return <ComingSoon />;
     }
   };
 
@@ -246,6 +259,7 @@ const Profile = () => {
                     overflow: "auto",
                   }}
                 >
+                  {renderBoardContent()}
                 </Box>
               </Box>
 
