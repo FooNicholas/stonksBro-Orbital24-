@@ -323,7 +323,8 @@ app.post("/reject", async (req, res) => {
     console.error("Error deleting from friend_request table:", deleteRequestError);
     return res.status(500).send("Internal server error.");
     }
-    
+
+    res.status(200).send("Friend request rejected successfully.")
   } catch (error) {
     console.error("Server error:", error);
     res.status(500).send("Internal server error.");
