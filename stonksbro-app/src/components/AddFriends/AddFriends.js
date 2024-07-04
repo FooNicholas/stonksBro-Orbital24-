@@ -210,6 +210,7 @@ const AddFriends = () => {
                           display: "flex",
                           justifyContent: "space-between",
                           borderRadius: "5px",
+                          marginBottom: "10px",
                         }}
                       >
                         <ListItemText
