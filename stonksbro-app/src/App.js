@@ -9,6 +9,7 @@ import UpdatePassword from "./components/UpdatePassword/UpdatePassword";
 import Profile from "./components/Profile/Profile";
 import Friends from "./components/FriendsList/FriendsList";
 import AddFriends from "./components/AddFriends/AddFriends";
+import TradingSimulator from "./components/TradingSimulator/TradingSimulator";
 
 import "./index.css";
 
@@ -50,6 +51,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <AddFriends />
+              </ProtectedRoute>
+            }
+          />
+          <Route 
+            path="/simulator"
+            element={
+              <ProtectedRoute>
+                <TradingSimulator />
               </ProtectedRoute>
             }
           />
