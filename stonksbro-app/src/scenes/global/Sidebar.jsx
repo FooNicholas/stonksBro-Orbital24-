@@ -214,7 +214,7 @@ const Navbar = () => {
             />
             <Item
               title="Trading Simulator"
-              //to="/faq"
+              to="/simulator"
               icon={<BalanceIcon />}
               selected={selected}
               setSelected={setSelected}

@@ -179,6 +179,9 @@ function TradingViewDashboard() {
                 backgroundColor: colors.blueAccent[600],
                 color: colors.grey[100],
                 fontWeight: "bold",
+                "&:hover": {
+                backgroundColor: colors.blueAccent[700],
+                },
               }}
             >
               Add
