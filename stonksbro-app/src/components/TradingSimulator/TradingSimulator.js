@@ -5,12 +5,7 @@ import Topbar from "../../scenes/global/Topbar";
 import { tokens, ColorModeContext, useMode } from "../../theme";
 import { Box, useTheme, CssBaseline, ThemeProvider } from "@mui/material";
 
-import Portolio from "./Portfolio";
-import Subheader from "./Subheader";
-
-/*Fetch the data from database here 
-then pass the necessary data into the subsections and 
-handle the details in subsections*/
+import Portfolio from "./Portfolio";
 
 const TradingSimulator = () => {
   const colorTheme = useTheme();
@@ -29,8 +24,7 @@ const TradingSimulator = () => {
             <Box m="15px">
               <Header title="TRADING SIMULATOR" />
             </Box>
-            <Subheader />
-            <Portolio />
+            <Portfolio />
           </main>
         </div>
       </ThemeProvider>

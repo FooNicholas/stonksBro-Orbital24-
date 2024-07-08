@@ -7,6 +7,7 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { createClient } = require("@supabase/supabase-js");
 const nodemailer = require("nodemailer");
+const finnhub = require("finnhub");
 
 const app = express();
 const port = process.env.PORT || 5000;
@@ -17,6 +18,9 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 const JWT_SECRET = process.env.JWT_SECRET_KEY;
+const api_key = finnhub.ApiClient.instance.authentications["api_key"];
+api_key.apiKey = process.env.FINNHUB_API_KEY;
+const finnhubClient = new finnhub.DefaultApi();
 
 const supabaseURL = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_KEY;
@@ -54,9 +58,12 @@ app.post("/login", async (req, res) => {
   const isPasswordValid = await bcrypt.compare(password, user.hashedPassword);
 
   if (isPasswordValid) {
-    const token = jwt.sign({ userId: user.id, username: user.username }, JWT_SECRET, { expiresIn: "1h" });
+    const token = jwt.sign(
+      { userId: user.id, username: user.username },
+      JWT_SECRET,
+      { expiresIn: "1h" }
+    );
     res.status(200).json({ token, username: user.username, userId: user.id });
-
   } else {
     res.status(401).send("Invalid email or password.");
   }
@@ -84,13 +91,12 @@ app.post("/register", async (req, res) => {
   }
 
   if (existingUsers.length > 0) {
-    if (existingUsers.some(user => user.email === email)) {
+    if (existingUsers.some((user) => user.email === email)) {
       return res.status(400).send("Email is already registered.");
     }
-    if (existingUsers.some(user => user.username === username)) {
+    if (existingUsers.some((user) => user.username === username)) {
       return res.status(400).send("Username is already taken.");
     }
-
   }
 
   let hashedPassword = await bcrypt.hash(password, 10);
@@ -148,7 +154,7 @@ app.post("/reset", async (req, res) => {
     <p>You requested a password reset.</p>
     <p>Click the link below to reset your password:</p>
     <a href="${resetURL}" style="background-color: #4CAF50; color: white; padding: 10px 20px; text-align: center; text-decoration: none; display: inline-block; font-size: 16px;">Reset Password</a>
-    <p>If you did not request this, please ignore this email.</p>` 
+    <p>If you did not request this, please ignore this email.</p>`,
   };
 
   transporter.sendMail(mailOptions, (error, info) => {
@@ -159,7 +165,6 @@ app.post("/reset", async (req, res) => {
     res.status(200).send("Password reset email sent.");
   });
 });
-
 
 app.post("/update-password", async (req, res) => {
   const { token, newPassword } = req.body;
@@ -175,7 +180,10 @@ app.post("/update-password", async (req, res) => {
     .single();
 
   if (userError || !user) {
-    console.error("Supabase error:", userError ? userError.message : "User not found");
+    console.error(
+      "Supabase error:",
+      userError ? userError.message : "User not found"
+    );
     return res.status(400).send("Invalid or expired token.");
   }
 
@@ -188,7 +196,11 @@ app.post("/update-password", async (req, res) => {
 
   const { error: updateError } = await supabase
     .from("users")
-    .update({ hashedPassword: hashedPassword, reset_token: null, reset_token_expiration: null })
+    .update({
+      hashedPassword: hashedPassword,
+      reset_token: null,
+      reset_token_expiration: null,
+    })
     .eq("id", user.id);
 
   if (updateError) {
@@ -203,33 +215,36 @@ app.post("/send-friend-request", async (req, res) => {
   const { senderId, receiverUsername } = req.body;
 
   if (!senderId || !receiverUsername) {
-      return res.status(400).send("Sender ID and receiver username are required.");
+    return res
+      .status(400)
+      .send("Sender ID and receiver username are required.");
   }
 
   const { data: receiver, error: receiverError } = await supabase
-      .from("users")
-      .select("id")
-      .eq("username", receiverUsername)
-      .single();  
+    .from("users")
+    .select("id")
+    .eq("username", receiverUsername)
+    .single();
 
   if (receiverError || !receiver) {
-      return res.status(404).send("User not found.");
+    return res.status(404).send("User not found.");
   }
 
   const date = new Date();
 
   const { error: insertError } = await supabase
-      .from("friend_request")
-      .insert([{ sender_id: senderId, receiver_id: receiver.id, created_at: date }]);
+    .from("friend_request")
+    .insert([
+      { sender_id: senderId, receiver_id: receiver.id, created_at: date },
+    ]);
 
   if (insertError) {
-      console.error("Supabase error:", insertError.message);
-      return res.status(500).send("Internal server error.");
+    console.error("Supabase error:", insertError.message);
+    return res.status(500).send("Internal server error.");
   }
 
   res.status(200).send("Friend request sent successfully.");
 });
-
 
 app.get("/friend-requests/:userId", async (req, res) => {
   const { userId } = req.params;
@@ -252,7 +267,7 @@ app.get("/friend-requests/:userId", async (req, res) => {
     }
 
     // Fetch usernames based on sender_ids
-    const senderIds = requests.map(request => request.sender_id);
+    const senderIds = requests.map((request) => request.sender_id);
     const { data: users, error: usersError } = await supabase
       .from("users")
       .select("id, username")
@@ -264,9 +279,12 @@ app.get("/friend-requests/:userId", async (req, res) => {
     }
 
     // Map usernames to friend requests
-    const requestsWithUsernames = requests.map(request => {
-      const sender = users.find(user => user.id === request.sender_id);
-      return { ...request, sender_username: sender ? sender.username : "Unknown" };
+    const requestsWithUsernames = requests.map((request) => {
+      const sender = users.find((user) => user.id === request.sender_id);
+      return {
+        ...request,
+        sender_username: sender ? sender.username : "Unknown",
+      };
     });
 
     res.status(200).json(requestsWithUsernames);
@@ -281,25 +299,31 @@ app.post("/accept", async (req, res) => {
 
   try {
     const { data: addFriend, error: addFriendError } = await supabase
-    .from("friends")
-    .insert([{user_id: userId, friends_id: senderId}, {user_id: senderId, friends_id: userId}]);
+      .from("friends")
+      .insert([
+        { user_id: userId, friends_id: senderId },
+        { user_id: senderId, friends_id: userId },
+      ]);
 
     if (addFriendError) {
       console.error("Error inserting into friends table:", addFriendError);
       return res.status(500).send("Internal server error.");
-   }
-
-   const { data: deleteRequest, error: deleteRequestError } = await supabase
-   .from("friend_request")
-   .delete()
-   .match({receiver_id: userId, sender_id: senderId});
-
-   if (deleteRequestError) {
-    console.error("Error deleting from friend_request table:", deleteRequestError);
-    return res.status(500).send("Internal server error.");
     }
-    
-    res.status(200).send("Friend request accepted successfully.")
+
+    const { data: deleteRequest, error: deleteRequestError } = await supabase
+      .from("friend_request")
+      .delete()
+      .match({ receiver_id: userId, sender_id: senderId });
+
+    if (deleteRequestError) {
+      console.error(
+        "Error deleting from friend_request table:",
+        deleteRequestError
+      );
+      return res.status(500).send("Internal server error.");
+    }
+
+    res.status(200).send("Friend request accepted successfully.");
   } catch (error) {
     console.error("Server error:", error);
     res.status(500).send("Internal server error.");
@@ -315,16 +339,19 @@ app.post("/reject", async (req, res) => {
 
   try {
     const { data: deleteRequest, error: deleteRequestError } = await supabase
-   .from("friend_request")
-   .delete()
-   .match({receiver_id: userId, sender_id: senderId});
+      .from("friend_request")
+      .delete()
+      .match({ receiver_id: userId, sender_id: senderId });
 
-   if (deleteRequestError) {
-    console.error("Error deleting from friend_request table:", deleteRequestError);
-    return res.status(500).send("Internal server error.");
+    if (deleteRequestError) {
+      console.error(
+        "Error deleting from friend_request table:",
+        deleteRequestError
+      );
+      return res.status(500).send("Internal server error.");
     }
 
-    res.status(200).send("Friend request rejected successfully.")
+    res.status(200).send("Friend request rejected successfully.");
   } catch (error) {
     console.error("Server error:", error);
     res.status(500).send("Internal server error.");
@@ -344,8 +371,8 @@ app.get("/friends/:userId", async (req, res) => {
       console.error("Supabase error:", error.message);
       return res.status(500).send("Internal server error.");
     }
-    
-    const friend_id = friends.map(request => request.friends_id);
+
+    const friend_id = friends.map((request) => request.friends_id);
     const { data: friendDetails, error: friendDetailsError } = await supabase
       .from("users")
       .select("id, username, avatar")
@@ -367,10 +394,10 @@ app.get("/get-avatar/:userId", async (req, res) => {
   const { userId } = req.params;
   try {
     const { data: avatar, error } = await supabase
-    .from("users")
-    .select("avatar")
-    .eq("id", userId)
-    .single();
+      .from("users")
+      .select("avatar")
+      .eq("id", userId)
+      .single();
 
     if (error) {
       console.error("Supabase error:", error.message);
@@ -390,8 +417,7 @@ app.post("/change-avatar", async (req, res) => {
   const fileName = avatar;
 
   try {
-    const { data: icon, error: retrieveIconError } = supabase
-      .storage
+    const { data: icon, error: retrieveIconError } = supabase.storage
       .from("profile_icon")
       .getPublicUrl(avatar);
 
@@ -422,10 +448,10 @@ app.get("/watchlist/:userId", async (req, res) => {
 
   try {
     const { data: watchlistData, error: fetchWatchlistError } = await supabase
-    .from("users")
-    .select("watchlist")
-    .eq("id", userId)
-    .single()
+      .from("users")
+      .select("watchlist")
+      .eq("id", userId)
+      .single();
 
     if (fetchWatchlistError) {
       console.error("Supabase error:", fetchWatchlistError.message);
@@ -436,21 +462,22 @@ app.get("/watchlist/:userId", async (req, res) => {
   } catch (error) {
     console.error("Server error:", error);
     res.status(500).send("Internal server error.");
-  } 
+  }
 });
 
 app.post("/add-symbol", async (req, res) => {
   const { userId, newWatchlist } = req.body;
 
   try {
-    const { data: updateWatchlist, error: updateWatchlistError } = await supabase
-    .from("users")
-    .update({watchlist: newWatchlist})
-    .eq("id", userId)
+    const { data: updateWatchlist, error: updateWatchlistError } =
+      await supabase
+        .from("users")
+        .update({ watchlist: newWatchlist })
+        .eq("id", userId);
 
     if (updateWatchlistError) {
       console.error("Supabase error:", updateWatchlistError.message);
-      return res.status(500).send("Internal server error.")
+      return res.status(500).send("Internal server error.");
     }
     res.status(200).send("Successfully added symbol to watchlist");
   } catch (error) {
@@ -463,14 +490,15 @@ app.post("/remove-symbol", async (req, res) => {
   const { userId, newWatchlist } = req.body;
 
   try {
-    const { data: updateWatchlist, error: updateWatchlistError } = await supabase
-    .from("users")
-    .update({watchlist: newWatchlist})
-    .eq("id", userId)
+    const { data: updateWatchlist, error: updateWatchlistError } =
+      await supabase
+        .from("users")
+        .update({ watchlist: newWatchlist })
+        .eq("id", userId);
 
     if (updateWatchlistError) {
       console.error("Supabase error:", updateWatchlistError.message);
-      return res.status(500).send("Internal server error.")
+      return res.status(500).send("Internal server error.");
     }
     res.status(200).send("Successfully added symbol to watchlist");
   } catch (error) {
@@ -484,17 +512,17 @@ app.get("/ticker/:userId", async (req, res) => {
 
   try {
     const { data: tickers, error: fetchTickerError } = await supabase
-    .from("users")
-    .select("ticker")
-    .eq("id", userId)
-    .single()
+      .from("users")
+      .select("ticker")
+      .eq("id", userId)
+      .single();
 
     if (fetchTickerError) {
-      console.error("Supabase error:", fetchTickerError.message)
-      return res.status(500).send("Internal server error.")
+      console.error("Supabase error:", fetchTickerError.message);
+      return res.status(500).send("Internal server error.");
     }
 
-    res.status(200).json(tickers.ticker)
+    res.status(200).json(tickers.ticker);
   } catch (error) {
     console.error("Server error:", error);
     res.status(500).send("Internal server error.");
@@ -506,16 +534,166 @@ app.post("/update-ticker", async (req, res) => {
 
   try {
     const { data: tickersData, error: fetchTickerError } = await supabase
-    .from("users")
-    .update({ticker: symbols})
-    .eq("id", userId)
+      .from("users")
+      .update({ ticker: symbols })
+      .eq("id", userId);
 
     if (fetchTickerError) {
-      console.error("Supabase error:", fetchTickerError.message)
-      return res.status(500).send("Internal server error.")
+      console.error("Supabase error:", fetchTickerError.message);
+      return res.status(500).send("Internal server error.");
     }
 
-    res.status(200).send("Success")
+    res.status(200).send("Success");
+  } catch (error) {
+    console.error("Server error:", error);
+    res.status(500).send("Internal server error.");
+  }
+});
+
+app.get("/api/stock/:symbol", async (req, res) => {
+  const { symbol } = req.params;
+  try {
+    finnhubClient.quote(symbol, (error, data, response) => {
+      if (error) {
+        console.error("Error fetching data from Finnhub:", error);
+        return res.status(500).json({ error: "Error fetching data" });
+      }
+
+      var currentValue = data.c; // Current price
+
+      if (currentValue === undefined) {
+        console.error("Invalid response data:", data);
+        return res.status(500).json({ error: "Invalid response from Finnhub" });
+      }
+
+      res.json({ symbol, currentValue });
+    });
+  } catch (error) {
+    console.error("Server error:", error);
+    res.status(500).send("Internal server error.");
+  }
+});
+
+app.post("/api/buy/:symbol", async (req, res) => {
+  const { symbol } = req.params;
+  const { userId, position, held } = req.body;
+
+  try {
+    let currentValue;
+    await new Promise((resolve, reject) => {
+      finnhubClient.quote(symbol, (error, data, response) => {
+        if (error) {
+          console.error("Error fetching data from Finnhub:", error);
+          return reject("Error fetching data");
+        }
+
+        if (data.c === undefined) {
+          console.error("Invalid response data:", data);
+          return reject("Invalid response from Finnhub");
+        } else {
+          currentValue = data.c; // Current price
+          resolve();
+        }
+      });
+    });
+
+    let { data: portfolio, error } = await supabase
+      .from("users")
+      .select("trades, balance")
+      .eq("id", userId)
+      .single();
+
+    if (error) {
+      console.error("Error fetching portfolio:", error.message);
+      return res.status(500).json({ error: "Error fetching portfolio" });
+    }
+
+    let trades = portfolio.trades || []; //updating the portfolio
+    trades.push({
+      symbol: symbol,
+      position: position,
+      held: parseInt(held),
+      boughtAt: currentValue,
+    });
+
+    let tradecost = parseFloat(held * currentValue);
+
+    if (tradecost > portfolio.balance) {
+      return res.status(400).json({
+        error: "You balance is insufficient",
+        tradecost: tradecost,
+        balance: portfolio.balance,
+      });
+    }
+
+    const newBalance = parseFloat(portfolio.balance - tradecost);
+
+    const { error: updateError } = await supabase
+      .from("users")
+      .update({ trades: trades, balance: newBalance })
+      .eq("id", userId);
+
+    if (updateError) {
+      console.error("Error updating portfolio:", updateError.message);
+      return res.status(500).json({ error: "Error updating portfolio" });
+    }
+
+    res
+      .status(200)
+      .json({ message: "Trade executed successfully", trades: trades, newBalance: newBalance });
+  } catch (error) {
+    console.error("Server error:", error);
+    res.status(500).send("Internal server error.");
+  }
+});
+
+app.get("/portfolio/:userId", async (req, res) => {
+  const { userId } = req.params;
+
+  try {
+    const { data: fetchPortfolio, error: fetchPortfolioError } = await supabase
+      .from("users")
+      .select("trades, balance")
+      .eq("id", userId);
+
+    if (fetchPortfolioError) {
+      console.error("Supabase error:", fetchPortfolioError.message);
+      return res.status(500).send("Internal server error.");
+    }
+
+    res.status(200).json(fetchPortfolio);
+  } catch (error) {
+    console.error("Server error:", error);
+    res.status(500).send("Internal server error.");
+  }
+});
+
+app.post("/sell/:userId", async (req, res) => {
+  const { userId } = req.params;
+  const { updatedPortfolio, newAccountBalance } = req.body;
+
+  try {
+    const { error: updatePortfolioError } = await supabase
+      .from("users")
+      .update({ trades: updatedPortfolio, balance: newAccountBalance })
+      .eq("id", userId);
+
+    if (updatePortfolioError) {
+      console.error("Error updating portfolio:", updatePortfolioError.message);
+      return res.status(500).json({ error: "Error updating portfolio" });
+    }
+
+    const { data: fetchBalance, error: fetchBalanceError } = await supabase
+      .from("users")
+      .select("balance")
+      .eq("id", userId);
+
+    if (fetchBalanceError) {
+      console.error("Supabase error:", fetchBalanceError.message);
+      return res.status(500).send("Internal server error.");
+    }
+
+    res.status(200).json(fetchBalance);
   } catch (error) {
     console.error("Server error:", error);
     res.status(500).send("Internal server error.");
