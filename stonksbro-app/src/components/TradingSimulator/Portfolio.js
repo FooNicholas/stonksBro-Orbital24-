@@ -35,7 +35,7 @@ const Portfolio = () => {
 
   const [portfolio, setPortfolio] = useState([]);
   const [totalCurrentValue, setTotalCurrentValue] = useState(0);
-  const [accountBalance, setAccountBalance] = useState(0)
+  const [accountBalance, setAccountBalance] = useState(0);
 
   const [isSellDialogOpen, setIsSellDialogOpen] = useState(false);
   const [isTradeDialogOpen, setIsTradeDialogOpen] = useState(false);
@@ -99,7 +99,7 @@ const Portfolio = () => {
   const handleBuyOrder = async () => {
     try {
       const response = await fetch(
-        `http://localhost:5000/api/buy/${buyData.symbol}`,
+        `https://stonks-bro-orbital24-server.vercel.app/api/buy/${buyData.symbol}`,
         {
           method: "POST",
           headers: {
@@ -163,16 +163,19 @@ const Portfolio = () => {
         sellData.quantity * sellData.currentValue + accountBalance
       ).toFixed(2);
 
-      const response = await fetch(`http://localhost:5000/sell/${userId}`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          updatedPortfolio: updatedPortfolio,
-          newAccountBalance: newAccountBalance
-        }),
-      });
+      const response = await fetch(
+        `https://stonks-bro-orbital24-server.vercel.app/sell/${userId}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            updatedPortfolio: updatedPortfolio,
+            newAccountBalance: newAccountBalance,
+          }),
+        }
+      );
 
       if (response.ok) {
         setPortfolio(updatedPortfolio);
@@ -193,7 +196,9 @@ const Portfolio = () => {
 
   const getPortfolio = async () => {
     try {
-      const response = await fetch(`http://localhost:5000/portfolio/${userId}`);
+      const response = await fetch(
+        `https://stonks-bro-orbital24-server.vercel.app/portfolio/${userId}`
+      );
 
       if (response.ok) {
         const data = await response.json();
@@ -213,7 +218,7 @@ const Portfolio = () => {
       const updatedPortfolio = await Promise.all(
         currentPortfolio.map(async (stock) => {
           const response = await fetch(
-            `http://localhost:5000/api/stock/${stock.symbol}`
+            `https://stonks-bro-orbital24-server.vercel.app/api/stock/${stock.symbol}`
           );
 
           if (response.ok) {
@@ -278,8 +283,7 @@ const Portfolio = () => {
               width: "150px",
               alignContent: "center",
             }}
-          >
-          </Box>
+          ></Box>
         </Box>
         <Box>
           <Button
