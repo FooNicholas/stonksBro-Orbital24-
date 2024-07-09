@@ -31,7 +31,7 @@ const AddFriends = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [message, setMessage] = useState("");
   const [friendRequests, setFriendRequests] = useState([]);
-  const { userId } = useAuth();
+  const { userId, username } = useAuth();
 
   useEffect(() => {
     const fetchFriendRequests = async () => {
@@ -119,33 +119,37 @@ const AddFriends = () => {
   const handleSendFriendRequest = async (e) => {
     e.preventDefault();
 
-    try {
-      const response = await fetch(
-        "https://stonks-bro-orbital24-server.vercel.app/send-friend-request",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            senderId: userId,
-            receiverUsername: searchQuery,
-          }),
-        }
-      );
+    if (searchQuery === username) {
+      setMessage("You cannot send a friend request to yourself");
+    } else {
+      try {
+        const response = await fetch(
+          "https://stonks-bro-orbital24-server.vercel.app/send-friend-request",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              senderId: userId,
+              receiverUsername: searchQuery,
+            }),
+          }
+        );
 
-      if (response.ok) {
-        setMessage("Friend request sent successfully.");
-        setSearchQuery("");
-      } else {
-        const errorMessage = await response.text();
-        setMessage(errorMessage);
+        if (response.ok) {
+          setMessage("Friend request sent successfully.");
+          setSearchQuery("");
+        } else {
+          const errorMessage = await response.text();
+          setMessage(errorMessage);
+          setSearchQuery("");
+        }
+      } catch (error) {
+        console.error("Error sending friend request:", error);
+        setMessage("Error sending friend request.");
         setSearchQuery("");
       }
-    } catch (error) {
-      console.error("Error sending friend request:", error);
-      setMessage("Error sending friend request.");
-      setSearchQuery("");
     }
   };
 
@@ -175,7 +179,8 @@ const AddFriends = () => {
                     fullWidth
                     margin="normal"
                   />
-                  <Button type="submit"
+                  <Button
+                    type="submit"
                     sx={{
                       backgroundColor: colors.blueAccent[600],
                       color: colors.grey[100],
