@@ -27,6 +27,7 @@ import AddIcon from "@mui/icons-material/Add";
 import CloseIcon from "@mui/icons-material/Close";
 
 import { useAuth } from "../AuthContext/AuthContext";
+import AutocompleteBox from "./Autocomplete";
 
 const Portfolio = () => {
   const colorTheme = useTheme();
@@ -49,9 +50,9 @@ const Portfolio = () => {
   const [buyData, setBuyData] = useState({
     symbol: "", //text
     position: "Long", //text
-    quantity: 0, //integer
+    quantity: "", //integer
     type: "Market", //text
-    price: 0, //integer
+    price: "", //integer
   });
 
   const handleErrorDialogClose = () => {
@@ -151,8 +152,8 @@ const Portfolio = () => {
           if (stock.symbol === sellData.symbol) {
             return {
               ...stock,
-              held: parseInt(stock.held - sellData.quantity),
-              currentValue: parseInt(stock.currentValue),
+              held: stock.held - sellData.quantity,
+              currentValue: stock.currentValue,
             };
           }
           return stock;
@@ -178,11 +179,7 @@ const Portfolio = () => {
       );
 
       if (response.ok) {
-        setPortfolio(updatedPortfolio);
-        calculateTotalCurrentValue(updatedPortfolio);
-        const data = await response.json();
-
-        setAccountBalance(newAccountBalance);
+        getPortfolio();
 
         console.log("Successfully processed sell order");
         handleSellDialogClose();
@@ -342,18 +339,10 @@ const Portfolio = () => {
                   >
                     <Typography> Symbol: </Typography>
                   </Box>
-                  <Box height={50} width={200} ml={2}>
-                    <TextField
-                      label="Buy Symbol"
-                      value={buyData.symbol}
-                      onChange={(e) =>
-                        setBuyData({
-                          ...buyData,
-                          symbol: e.target.value,
-                        })
-                      }
-                      variant="outlined"
-                      sx={{ width: "100%" }}
+                  <Box height={50} width={300} ml={2}>
+                    <AutocompleteBox
+                      buyData={buyData}
+                      setBuyData={setBuyData}
                     />
                   </Box>
                 </Box>
@@ -366,7 +355,7 @@ const Portfolio = () => {
                   >
                     <Typography> Position: </Typography>
                   </Box>
-                  <Box height={50} width={200} ml={2}>
+                  <Box height={50} width={300} ml={2}>
                     <FormControl fullWidth>
                       <InputLabel> Position </InputLabel>
                       <Select
@@ -396,7 +385,7 @@ const Portfolio = () => {
                   >
                     <Typography> Quantity: </Typography>
                   </Box>
-                  <Box height={50} width={200} ml={2}>
+                  <Box height={50} width={300} ml={2}>
                     <TextField
                       label="Quantity"
                       type="number"
@@ -421,7 +410,7 @@ const Portfolio = () => {
                   >
                     <Typography> Type: </Typography>
                   </Box>
-                  <Box height={50} width={200} ml={2}>
+                  <Box height={50} width={300} ml={2}>
                     <FormControl fullWidth>
                       <InputLabel> Type </InputLabel>
                       <Select
@@ -501,7 +490,7 @@ const Portfolio = () => {
                   "&:hover": {
                     backgroundColor: colors.blueAccent[700],
                   },
-                  mt: 1,
+                  mt: 2,
                 }}
               >
                 BUY
@@ -594,7 +583,9 @@ const Portfolio = () => {
                   <TableCell sx={{ fontSize: "14px" }}>
                     {data.position}
                   </TableCell>
-                  <TableCell sx={{ fontSize: "14px" }}>{data.held}</TableCell>
+                  <TableCell sx={{ fontSize: "14px" }}>
+                    {parseFloat(data.held).toFixed(1)}
+                  </TableCell>
                   <TableCell sx={{ fontSize: "14px" }}>
                     ${parseFloat(data.boughtAt).toFixed(2)}
                   </TableCell>

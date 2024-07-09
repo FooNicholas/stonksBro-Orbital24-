@@ -612,7 +612,7 @@ app.post("/api/buy/:symbol", async (req, res) => {
     trades.push({
       symbol: symbol,
       position: position,
-      held: parseInt(held),
+      held: held,
       boughtAt: currentValue,
     });
 
@@ -640,7 +640,11 @@ app.post("/api/buy/:symbol", async (req, res) => {
 
     res
       .status(200)
-      .json({ message: "Trade executed successfully", trades: trades, newBalance: newBalance });
+      .json({
+        message: "Trade executed successfully",
+        trades: trades,
+        newBalance: newBalance,
+      });
   } catch (error) {
     console.error("Server error:", error);
     res.status(500).send("Internal server error.");
