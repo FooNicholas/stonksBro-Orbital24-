@@ -390,6 +390,38 @@ app.get("/friends/:userId", async (req, res) => {
   }
 });
 
+app.post("/remove-friend", async (req, res) => {
+  const { userId, friendId } = req.body;
+
+  try {
+    const { error: error1 } = await supabase
+      .from("friends")
+      .delete()
+      .match({ user_id: userId, friends_id: friendId });
+
+    if (error1) {
+      console.error("Supabase error:", error1.message);
+      return res.status(500).send("Internal server error.");
+    }
+
+    // Delete the reverse direction of the friendship
+    const { error: error2 } = await supabase
+      .from("friends")
+      .delete()
+      .match({ user_id: friendId, friends_id: userId });
+
+    if (error2) {
+      console.error("Supabase error:", error2.message);
+      return res.status(500).send("Internal server error.");
+    }
+
+    res.status(200).send("Friend deleted from friends list succesfully.");
+  } catch (error) {
+    console.error("Server error:", error);
+    res.status(500).send("Internal server error.");
+  }
+});
+
 app.get("/get-avatar/:userId", async (req, res) => {
   const { userId } = req.params;
   try {
@@ -638,13 +670,11 @@ app.post("/api/buy/:symbol", async (req, res) => {
       return res.status(500).json({ error: "Error updating portfolio" });
     }
 
-    res
-      .status(200)
-      .json({
-        message: "Trade executed successfully",
-        trades: trades,
-        newBalance: newBalance,
-      });
+    res.status(200).json({
+      message: "Trade executed successfully",
+      trades: trades,
+      newBalance: newBalance,
+    });
   } catch (error) {
     console.error("Server error:", error);
     res.status(500).send("Internal server error.");

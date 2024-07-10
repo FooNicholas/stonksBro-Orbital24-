@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useAuth } from "../AuthContext/AuthContext";
-import { ColorModeContext, useMode } from "../../theme";
+import { tokens, ColorModeContext, useMode } from "../../theme";
 import {
   Box,
   Typography,
@@ -9,7 +9,14 @@ import {
   useTheme,
   CssBaseline,
   ThemeProvider,
+  Button,
+  IconButton,
+  Dialog,
+  DialogContent,
+  DialogTitle,
 } from "@mui/material";
+import PersonRemoveOutlinedIcon from "@mui/icons-material/PersonRemoveOutlined";
+import CloseIcon from "@mui/icons-material/Close";
 
 import Sidebar from "../../scenes/global/Sidebar";
 import Topbar from "../../scenes/global/Topbar";
@@ -18,33 +25,73 @@ import Header from "../Header/Header";
 
 const Friends = () => {
   const colorTheme = useTheme();
-  const colors = colorTheme.palette;
+  const colors = tokens(colorTheme.palette.mode);
   const [theme, colorMode] = useMode();
   const [isSidebar, setIsSidebar] = useState(true);
 
   const [friends, setFriends] = useState([]);
   const { userId } = useAuth();
+  const [deleteDialog, setDeleteDialog] = useState(false);
+  const [removeFriend, setRemoveFriend] = useState({
+    friendUsername: "",
+    friendId: "",
+  });
 
   useEffect(() => {
-    const fetchFriends = async () => {
-      try {
-        const response = await fetch(
-          `https://stonks-bro-orbital24-server.vercel.app/friends/${userId}`
-        );
-        if (response.ok) {
-          const data = await response.json();
-          setFriends(data);
-          console.log(data);
-        } else {
-          console.error("Failed to fetch friends");
-        }
-      } catch (error) {
-        console.error("Error fetching friends:", error);
-      }
-    };
-
     fetchFriends();
-  }, [userId]);
+  }, []);
+
+  const fetchFriends = async () => {
+    try {
+      const response = await fetch(
+        `https://stonks-bro-orbital24-server.vercel.app/friends/${userId}`
+      );
+      if (response.ok) {
+        const data = await response.json();
+        setFriends(data);
+        console.log(data);
+      } else {
+        console.error("Failed to fetch friends");
+      }
+    } catch (error) {
+      console.error("Error fetching friends:", error);
+    }
+  };
+
+  const handleDeleteDialogOpen = (username, id) => {
+    setRemoveFriend({ friendUsername: username, friendId: id });
+    setDeleteDialog(true);
+  };
+
+  const handleDeleteDialogClose = () => {
+    setDeleteDialog(false);
+    setRemoveFriend({ friendUsername: "", friendId: "" });
+  };
+
+  const handleRemoveFriend = async (friendId) => {
+    handleDeleteDialogClose();
+    try {
+      const response = await fetch(`http://localhost:5000/remove-friend`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userId: userId,
+          friendId: friendId,
+        }),
+      });
+
+      if (response.ok) {
+        fetchFriends();
+        console.log("Successfully removed friend from friends list");
+      } else {
+        console.log("Failed to remove friend from friends list");
+      }
+    } catch (error) {
+      console.error("Error removing friend:", error);
+    }
+  };
 
   return (
     <ColorModeContext.Provider value={colorMode}>
@@ -74,9 +121,25 @@ const Friends = () => {
                         display: "flex",
                         flexDirection: "column",
                         alignItems: "center",
-                        justifyContent: "center",
+                        position: "relative",
                       }}
                     >
+                      <IconButton
+                        onClick={() =>
+                          handleDeleteDialogOpen(friend.username, friend.id)
+                        }
+                        sx={{
+                          position: "absolute",
+                          top: 8,
+                          right: 16,
+                          color: colors.redAccent[500],
+                          "&:hover": {
+                            color: colors.redAccent[700],
+                          },
+                        }}
+                      >
+                        <PersonRemoveOutlinedIcon />
+                      </IconButton>
                       <Avatar
                         src={friend.avatar}
                         alt="Friend"
@@ -84,13 +147,68 @@ const Friends = () => {
                           width: "200px",
                           height: "200px",
                           borderRadius: "50%",
+                          mt: 3,
                           marginBottom: "10px",
                         }}
                       />
-                      <Typography variant="h4">
-                        {friend.username}
-                      </Typography>
+                      <Typography variant="h4">{friend.username}</Typography>
                     </Box>
+                    <Dialog
+                      open={deleteDialog}
+                      onClose={handleDeleteDialogClose}
+                    >
+                      <DialogTitle>
+                        <Typography fontSize="20px" fontWeight="bold">
+                          {" "}
+                          CONFIRMATION{" "}
+                        </Typography>
+                        <IconButton
+                          aria-label="close"
+                          onClick={handleDeleteDialogClose}
+                          sx={{
+                            position: "absolute",
+                            right: 8,
+                            top: 8,
+                            color: (theme) => theme.palette.grey[500],
+                          }}
+                        >
+                          <CloseIcon />
+                        </IconButton>
+                      </DialogTitle>
+                      <DialogContent>
+                        <Typography>
+                          {" "}
+                          You are about to remove {
+                            removeFriend.friendUsername
+                          }{" "}
+                          as friend.
+                        </Typography>
+                        <Typography>
+                          {" "}
+                          This action is irreversible. Are you sure?
+                        </Typography>
+                        <Button
+                          onClick={() =>
+                            handleRemoveFriend(removeFriend.friendId)
+                          }
+                          sx={{
+                            backgroundColor: colors.redAccent[600],
+                            color: colors.grey[100],
+                            fontSize: "15px",
+                            fontWeight: "bold",
+                            padding: "5px",
+                            "&:hover": {
+                              backgroundColor: colors.redAccent[700],
+                            },
+                            width: "100%",
+                            mt: 2,
+                          }}
+                        >
+                          {" "}
+                          REMOVE
+                        </Button>
+                      </DialogContent>
+                    </Dialog>
                   </Grid>
                 ))}
               </Grid>
