@@ -230,6 +230,36 @@ app.post("/send-friend-request", async (req, res) => {
     return res.status(404).send("User not found.");
   }
 
+  const { data: multipleRequest, error: multipleRequestError } = await supabase
+    .from("friend_request")
+    .select()
+    .match({ sender_id: senderId, receiver_id: receiver.id });
+
+  if (multipleRequest.length > 0) {
+    return res
+      .status(200)
+      .send("You have already sent a request to this account.");
+  }
+
+  if (multipleRequestError) {
+    console.error("Supabase error:", multipleRequestError.message);
+    return res.status(500).send("Internal server error.");
+  }
+
+  const { data: alreadyFriends, error: alreadyFriendsError } = await supabase
+    .from("friends")
+    .select()
+    .match({ user_id: senderId, friends_id: receiver.id });
+
+  if (alreadyFriends.length > 0) {
+    return res.status(200).send("You are already friends with this account");
+  }
+
+  if (alreadyFriendsError) {
+    console.error("Supabase error:", alreadyFriendsError.message);
+    return res.status(500).send("Internal server error.");
+  }
+
   const date = new Date();
 
   const { error: insertError } = await supabase
@@ -241,9 +271,9 @@ app.post("/send-friend-request", async (req, res) => {
   if (insertError) {
     console.error("Supabase error:", insertError.message);
     return res.status(500).send("Internal server error.");
+  } else {
+    res.status(200).send("Friend request sent successfully.");
   }
-
-  res.status(200).send("Friend request sent successfully.");
 });
 
 app.get("/friend-requests/:userId", async (req, res) => {
@@ -384,6 +414,37 @@ app.get("/friends/:userId", async (req, res) => {
     }
 
     res.status(200).json(friendDetails);
+  } catch (error) {
+    console.error("Server error:", error);
+    res.status(500).send("Internal server error.");
+  }
+});
+
+app.post("/remove-friend", async (req, res) => {
+  const { userId, friendId } = req.body;
+
+  try {
+    const { error: error1 } = await supabase
+      .from("friends")
+      .delete()
+      .match({ user_id: userId, friends_id: friendId });
+
+    if (error1) {
+      console.error("Supabase error:", error1.message);
+      return res.status(500).send("Internal server error.");
+    }
+
+    const { error: error2 } = await supabase
+      .from("friends")
+      .delete()
+      .match({ user_id: friendId, friends_id: userId });
+
+    if (error2) {
+      console.error("Supabase error:", error2.message);
+      return res.status(500).send("Internal server error.");
+    }
+
+    res.status(200).send("Friend deleted from friends list succesfully.");
   } catch (error) {
     console.error("Server error:", error);
     res.status(500).send("Internal server error.");
@@ -638,13 +699,11 @@ app.post("/api/buy/:symbol", async (req, res) => {
       return res.status(500).json({ error: "Error updating portfolio" });
     }
 
-    res
-      .status(200)
-      .json({
-        message: "Trade executed successfully",
-        trades: trades,
-        newBalance: newBalance,
-      });
+    res.status(200).json({
+      message: "Trade executed successfully",
+      trades: trades,
+      newBalance: newBalance,
+    });
   } catch (error) {
     console.error("Server error:", error);
     res.status(500).send("Internal server error.");
