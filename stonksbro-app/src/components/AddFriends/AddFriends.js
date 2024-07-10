@@ -138,7 +138,8 @@ const AddFriends = () => {
         );
 
         if (response.ok) {
-          setMessage("Friend request sent successfully.");
+          const responseMessage = await response.text();
+          setMessage(responseMessage);
           setSearchQuery("");
         } else {
           const errorMessage = await response.text();

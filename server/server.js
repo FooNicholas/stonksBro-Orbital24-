@@ -230,6 +230,36 @@ app.post("/send-friend-request", async (req, res) => {
     return res.status(404).send("User not found.");
   }
 
+  const { data: multipleRequest, error: multipleRequestError } = await supabase
+    .from("friend_request")
+    .select()
+    .match({ sender_id: senderId, receiver_id: receiver.id });
+
+  if (multipleRequest.length > 0) {
+    return res
+      .status(200)
+      .send("You have already sent a request to this account.");
+  }
+
+  if (multipleRequestError) {
+    console.error("Supabase error:", multipleRequestError.message);
+    return res.status(500).send("Internal server error.");
+  }
+
+  const { data: alreadyFriends, error: alreadyFriendsError } = await supabase
+    .from("friends")
+    .select()
+    .match({ user_id: senderId, friends_id: receiver.id });
+
+  if (alreadyFriends.length > 0) {
+    return res.status(200).send("You are already friends with this account");
+  }
+
+  if (alreadyFriendsError) {
+    console.error("Supabase error:", alreadyFriendsError.message);
+    return res.status(500).send("Internal server error.");
+  }
+
   const date = new Date();
 
   const { error: insertError } = await supabase
@@ -241,9 +271,9 @@ app.post("/send-friend-request", async (req, res) => {
   if (insertError) {
     console.error("Supabase error:", insertError.message);
     return res.status(500).send("Internal server error.");
+  } else {
+    res.status(200).send("Friend request sent successfully.");
   }
-
-  res.status(200).send("Friend request sent successfully.");
 });
 
 app.get("/friend-requests/:userId", async (req, res) => {
@@ -404,7 +434,6 @@ app.post("/remove-friend", async (req, res) => {
       return res.status(500).send("Internal server error.");
     }
 
-    // Delete the reverse direction of the friendship
     const { error: error2 } = await supabase
       .from("friends")
       .delete()

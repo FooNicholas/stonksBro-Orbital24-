@@ -71,16 +71,19 @@ const Friends = () => {
   const handleRemoveFriend = async (friendId) => {
     handleDeleteDialogClose();
     try {
-      const response = await fetch(`http://localhost:5000/remove-friend`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          userId: userId,
-          friendId: friendId,
-        }),
-      });
+      const response = await fetch(
+        `https://stonks-bro-orbital24-server.vercel.app/remove-friend`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            userId: userId,
+            friendId: friendId,
+          }),
+        }
+      );
 
       if (response.ok) {
         fetchFriends();
