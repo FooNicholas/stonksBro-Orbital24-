@@ -611,6 +611,26 @@ app.post("/update-ticker", async (req, res) => {
   }
 });
 
+app.post("/add-balance", async (req, res) => {
+  const { userId, newBalance } = req.body;
+
+  try {
+    const { error } = await supabase
+      .from("users")
+      .update({ balance: parseFloat(newBalance) })
+      .eq("id", userId);
+
+    if (error) {
+      console.error("Error adding balance:", error.message);
+      return res.status(500).send("Error adding balance:");
+    }
+    return res.status(200).send("Successfully added balance");
+  } catch (error) {
+    console.error("Server error:", error);
+    res.status(500).send("Internal server error.");
+  }
+});
+
 app.get("/api/stock/:symbol", async (req, res) => {
   const { symbol } = req.params;
   try {
@@ -673,8 +693,8 @@ app.post("/api/buy/:symbol", async (req, res) => {
     trades.push({
       symbol: symbol,
       position: position,
-      held: held,
-      boughtAt: currentValue,
+      held: parseFloat(held),
+      boughtAt: parseFloat(currentValue),
     });
 
     let tradecost = parseFloat(held * currentValue);
@@ -691,7 +711,7 @@ app.post("/api/buy/:symbol", async (req, res) => {
 
     const { error: updateError } = await supabase
       .from("users")
-      .update({ trades: trades, balance: newBalance })
+      .update({ trades: trades, balance: parseFloat(newBalance) })
       .eq("id", userId);
 
     if (updateError) {

@@ -42,6 +42,8 @@ const Portfolio = () => {
   const [isTradeDialogOpen, setIsTradeDialogOpen] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [isErrorDialogOpen, setErrorDialogOpen] = useState(false);
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [isConfirmSellDialogOpen, setIsConfirmSellDialogOpen] = useState(false);
 
   const totalAccountValue = (
     parseFloat(totalCurrentValue) + parseFloat(accountBalance)
@@ -129,14 +131,22 @@ const Portfolio = () => {
     }
   };
 
+  const [sellAmount, setSellAmount] = useState(0);
+
   const [sellData, setSellData] = useState({
+    index: "",
     symbol: "", //text
     quantity: "", //integer
     currentValue: "", //integer
   });
 
-  const handleSellDialogOpen = (symbol, held, currentValue) => {
-    setSellData({ symbol: symbol, quantity: held, currentValue: currentValue });
+  const handleSellDialogOpen = (index, symbol, held, currentValue) => {
+    setSellData({
+      index: index,
+      symbol: symbol,
+      quantity: held,
+      currentValue: currentValue,
+    });
     setIsSellDialogOpen(true);
   };
 
@@ -148,12 +158,12 @@ const Portfolio = () => {
   const handleSellOrder = async () => {
     try {
       const updatedPortfolio = portfolio
-        .map((stock) => {
-          if (stock.symbol === sellData.symbol) {
+        .map((stock, index) => {
+          if (index === sellData.index) {
             return {
               ...stock,
-              held: stock.held - sellData.quantity,
-              currentValue: stock.currentValue,
+              held: parseFloat(stock.held - sellData.quantity),
+              currentValue: parseFloat(stock.currentValue),
             };
           }
           return stock;
@@ -180,7 +190,6 @@ const Portfolio = () => {
 
       if (response.ok) {
         getPortfolio();
-
         console.log("Successfully processed sell order");
         handleSellDialogClose();
       } else {
@@ -188,6 +197,48 @@ const Portfolio = () => {
       }
     } catch (error) {
       console.error("Error processing sell order", error);
+    }
+  };
+
+  const [addBalance, setAddBalance] = useState(0);
+
+  const handleAddDialogOpen = () => {
+    setIsAddDialogOpen(true);
+  };
+
+  const handleAddDialogClose = () => {
+    setAddBalance(0);
+    setIsAddDialogOpen(false);
+    setErrorMessage("");
+  };
+
+  const handleAddBalance = async () => {
+    if (addBalance > 0) {
+      try {
+        const response = await fetch(
+          `https://stonks-bro-orbital24-server.vercel.app/add-balance`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              userId: userId,
+              newBalance: parseFloat(addBalance) + parseFloat(accountBalance),
+            }),
+          }
+        );
+
+        if (response.ok) {
+          getPortfolio();
+          setIsAddDialogOpen(false);
+          console.log("Successfully added to available balance");
+        }
+      } catch (error) {
+        console.error("Error adding to available balance", error);
+      }
+    } else {
+      setErrorMessage("Please enter a valid amount");
     }
   };
 
@@ -224,7 +275,7 @@ const Portfolio = () => {
 
             return {
               ...stock,
-              currentValue: parseFloat(currentValue).toFixed(2),
+              currentValue: parseFloat(currentValue),
             };
           } else {
             console.error("Error fetching stock prices");
@@ -250,7 +301,7 @@ const Portfolio = () => {
     getPortfolio();
     const interval = setInterval(() => {
       fetchRealTimePrices(portfolio);
-    }, 900000); // Fetch real time stock price every 15 minutes
+    }, 300000); // Fetch real time stock price every 5 minutes
 
     return () => clearInterval(interval);
   }, [userId, setTotalCurrentValue]);
@@ -282,159 +333,150 @@ const Portfolio = () => {
             }}
           ></Box>
         </Box>
-        <Box>
-          <Button
-            onClick={handleTradeDialogOpen}
-            sx={{
-              backgroundColor: colors.blueAccent[600],
-              color: colors.grey[100],
-              fontSize: "14px",
-              fontWeight: "bold",
-              padding: "10px 20px",
-              "&:hover": {
-                backgroundColor: colors.blueAccent[700],
-              },
-            }}
-          >
-            <AddIcon sx={{ mr: "10px" }} />
-            Trade
-          </Button>
-          <Dialog /*Trade Dialog*/
-            open={isTradeDialogOpen}
-            onClose={handleTradeDialogClose}
-          >
-            <DialogTitle>
-              <Typography fontSize="20px" fontWeight="bold">
-                {" "}
-                TRADE{" "}
-              </Typography>
-              <IconButton
-                aria-label="close"
-                onClick={handleTradeDialogClose}
-                sx={{
-                  position: "absolute",
-                  right: 8,
-                  top: 8,
-                  color: (theme) => theme.palette.grey[500],
-                }}
-              >
-                <CloseIcon />
-              </IconButton>
-            </DialogTitle>
-            <DialogContent>
-              <Box
-                sx={{
-                  mb: 2,
-                  flexDirection: "column",
-                  display: "flex",
-                  alignItems: "center",
-                }}
-              >
-                <Box sx={{ display: "flex", alignItems: "center", mt: 0.9 }}>
-                  <Box
-                    height={50}
-                    width={50}
-                    alignItems={"center"}
-                    display={"flex"}
-                  >
-                    <Typography> Symbol: </Typography>
+        <Box sx={{ flexDirection: "row", display: "flex" }}>
+          <Box sx={{ mr: 2 }}>
+            <Button
+              onClick={handleAddDialogOpen}
+              sx={{
+                backgroundColor: colors.blueAccent[600],
+                color: colors.grey[100],
+                fontSize: "14px",
+                fontWeight: "bold",
+                padding: "10px 20px",
+                "&:hover": {
+                  backgroundColor: colors.blueAccent[700],
+                },
+              }}
+            >
+              <AddIcon sx={{ mr: "10px" }} />
+              Add Balance
+            </Button>
+            <Dialog open={isAddDialogOpen} onClose={handleAddDialogClose}>
+              <DialogTitle width={275}>
+                <Typography fontSize="20px" fontWeight="bold">
+                  {" "}
+                  Add Balance{" "}
+                </Typography>
+                <IconButton
+                  aria-label="close"
+                  onClick={handleAddDialogClose}
+                  sx={{
+                    position: "absolute",
+                    right: 8,
+                    top: 8,
+                    color: (theme) => theme.palette.grey[500],
+                  }}
+                >
+                  <CloseIcon />
+                </IconButton>
+              </DialogTitle>
+              <DialogContent>
+                <TextField
+                  label="Amount"
+                  type="number"
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">$</InputAdornment>
+                    ),
+                  }}
+                  value={addBalance}
+                  onChange={(e) => setAddBalance(e.target.value)}
+                  variant="outlined"
+                  sx={{ width: "100%", mt: 1 }}
+                />
+                {errorMessage !== "" ? (
+                  <Typography sx={{ color: colors.redAccent[500] }}>
+                    {" "}
+                    {errorMessage}{" "}
+                  </Typography>
+                ) : (
+                  <Box></Box>
+                )}
+                <Button
+                  onClick={handleAddBalance}
+                  variant="contained"
+                  color="primary"
+                  sx={{
+                    backgroundColor: colors.blueAccent[600],
+                    color: colors.grey[100],
+                    fontSize: 15,
+                    fontWeight: "bold",
+                    width: "100%",
+                    "&:hover": {
+                      backgroundColor: colors.blueAccent[700],
+                    },
+                    mt: 2,
+                  }}
+                >
+                  Add Balance
+                </Button>
+              </DialogContent>
+            </Dialog>
+          </Box>
+          <Box>
+            <Button
+              onClick={handleTradeDialogOpen}
+              sx={{
+                backgroundColor: colors.blueAccent[600],
+                color: colors.grey[100],
+                fontSize: "14px",
+                fontWeight: "bold",
+                padding: "10px 20px",
+                "&:hover": {
+                  backgroundColor: colors.blueAccent[700],
+                },
+              }}
+            >
+              <AddIcon sx={{ mr: "10px" }} />
+              Trade
+            </Button>
+            <Dialog /*Trade Dialog*/
+              open={isTradeDialogOpen}
+              onClose={handleTradeDialogClose}
+            >
+              <DialogTitle>
+                <Typography fontSize="20px" fontWeight="bold">
+                  {" "}
+                  TRADE{" "}
+                </Typography>
+                <IconButton
+                  aria-label="close"
+                  onClick={handleTradeDialogClose}
+                  sx={{
+                    position: "absolute",
+                    right: 8,
+                    top: 8,
+                    color: (theme) => theme.palette.grey[500],
+                  }}
+                >
+                  <CloseIcon />
+                </IconButton>
+              </DialogTitle>
+              <DialogContent>
+                <Box
+                  sx={{
+                    mb: 2,
+                    flexDirection: "column",
+                    display: "flex",
+                    alignItems: "center",
+                  }}
+                >
+                  <Box sx={{ display: "flex", alignItems: "center", mt: 0.9 }}>
+                    <Box
+                      height={50}
+                      width={50}
+                      alignItems={"center"}
+                      display={"flex"}
+                    >
+                      <Typography> Symbol: </Typography>
+                    </Box>
+                    <Box height={50} width={300} ml={2}>
+                      <AutocompleteBox
+                        buyData={buyData}
+                        setBuyData={setBuyData}
+                      />
+                    </Box>
                   </Box>
-                  <Box height={50} width={300} ml={2}>
-                    <AutocompleteBox
-                      buyData={buyData}
-                      setBuyData={setBuyData}
-                    />
-                  </Box>
-                </Box>
-                <Box sx={{ display: "flex", alignItems: "center", mt: 3 }}>
-                  <Box
-                    height={50}
-                    width={50}
-                    alignItems={"center"}
-                    display={"flex"}
-                  >
-                    <Typography> Position: </Typography>
-                  </Box>
-                  <Box height={50} width={300} ml={2}>
-                    <FormControl fullWidth>
-                      <InputLabel> Position </InputLabel>
-                      <Select
-                        label="position"
-                        value={buyData.position}
-                        onChange={(e) =>
-                          setBuyData({
-                            ...buyData,
-                            position: e.target.value,
-                          })
-                        }
-                        variant="outlined"
-                      >
-                        <MenuItem value="Long"> Long </MenuItem>
-                        {/* <MenuItem value="Short"> Short </MenuItem> */}
-                        //not sure how to implement
-                      </Select>
-                    </FormControl>
-                  </Box>
-                </Box>
-                <Box sx={{ display: "flex", alignItems: "center", mt: 3 }}>
-                  <Box
-                    height={50}
-                    width={50}
-                    alignItems={"center"}
-                    display={"flex"}
-                  >
-                    <Typography> Quantity: </Typography>
-                  </Box>
-                  <Box height={50} width={300} ml={2}>
-                    <TextField
-                      label="Quantity"
-                      type="number"
-                      value={buyData.quantity}
-                      onChange={(e) =>
-                        setBuyData({
-                          ...buyData,
-                          quantity: e.target.value,
-                        })
-                      }
-                      variant="outlined"
-                      sx={{ width: "100%" }}
-                    />
-                  </Box>
-                </Box>
-                <Box sx={{ display: "flex", alignItems: "center", mt: 3 }}>
-                  <Box
-                    height={50}
-                    width={50}
-                    alignItems={"center"}
-                    display={"flex"}
-                  >
-                    <Typography> Type: </Typography>
-                  </Box>
-                  <Box height={50} width={300} ml={2}>
-                    <FormControl fullWidth>
-                      <InputLabel> Type </InputLabel>
-                      <Select
-                        label="Type"
-                        value={buyData.type}
-                        onChange={(e) =>
-                          setBuyData({
-                            ...buyData,
-                            type: e.target.value,
-                          })
-                        }
-                        variant="outlined"
-                        sx={{
-                          width: "100%",
-                        }}
-                      >
-                        <MenuItem value="Market"> Market </MenuItem>
-                        {/* <MenuItem value="Limit"> Limit </MenuItem> */}
-                        //not sure how to implement
-                      </Select>
-                    </FormControl>
-                  </Box>
-                </Box>
-                {buyData.type === "Limit" ? (
                   <Box sx={{ display: "flex", alignItems: "center", mt: 3 }}>
                     <Box
                       height={50}
@@ -442,22 +484,47 @@ const Portfolio = () => {
                       alignItems={"center"}
                       display={"flex"}
                     >
-                      <Typography> Price: </Typography>
+                      <Typography> Position: </Typography>
                     </Box>
-                    <Box height={50} width={200} ml={2}>
+                    <Box height={50} width={300} ml={2}>
+                      <FormControl fullWidth>
+                        <InputLabel> Position </InputLabel>
+                        <Select
+                          label="position"
+                          value={buyData.position}
+                          onChange={(e) =>
+                            setBuyData({
+                              ...buyData,
+                              position: e.target.value,
+                            })
+                          }
+                          variant="outlined"
+                        >
+                          <MenuItem value="Long"> Long </MenuItem>
+                          {/* <MenuItem value="Short"> Short </MenuItem> */}
+                          //not sure how to implement
+                        </Select>
+                      </FormControl>
+                    </Box>
+                  </Box>
+                  <Box sx={{ display: "flex", alignItems: "center", mt: 3 }}>
+                    <Box
+                      height={50}
+                      width={50}
+                      alignItems={"center"}
+                      display={"flex"}
+                    >
+                      <Typography> Quantity: </Typography>
+                    </Box>
+                    <Box height={50} width={300} ml={2}>
                       <TextField
-                        label="Price"
+                        label="Quantity"
                         type="number"
-                        InputProps={{
-                          startAdornment: (
-                            <InputAdornment position="start">$</InputAdornment>
-                          ),
-                        }}
-                        value={buyData.price}
+                        value={buyData.quantity}
                         onChange={(e) =>
                           setBuyData({
                             ...buyData,
-                            price: e.target.value,
+                            quantity: e.target.value,
                           })
                         }
                         variant="outlined"
@@ -465,38 +532,105 @@ const Portfolio = () => {
                       />
                     </Box>
                   </Box>
+                  <Box sx={{ display: "flex", alignItems: "center", mt: 3 }}>
+                    <Box
+                      height={50}
+                      width={50}
+                      alignItems={"center"}
+                      display={"flex"}
+                    >
+                      <Typography> Type: </Typography>
+                    </Box>
+                    <Box height={50} width={300} ml={2}>
+                      <FormControl fullWidth>
+                        <InputLabel> Type </InputLabel>
+                        <Select
+                          label="Type"
+                          value={buyData.type}
+                          onChange={(e) =>
+                            setBuyData({
+                              ...buyData,
+                              type: e.target.value,
+                            })
+                          }
+                          variant="outlined"
+                          sx={{
+                            width: "100%",
+                          }}
+                        >
+                          <MenuItem value="Market"> Market </MenuItem>
+                          {/* <MenuItem value="Limit"> Limit </MenuItem> */}
+                          //not sure how to implement
+                        </Select>
+                      </FormControl>
+                    </Box>
+                  </Box>
+                  {buyData.type === "Limit" ? (
+                    <Box sx={{ display: "flex", alignItems: "center", mt: 3 }}>
+                      <Box
+                        height={50}
+                        width={50}
+                        alignItems={"center"}
+                        display={"flex"}
+                      >
+                        <Typography> Price: </Typography>
+                      </Box>
+                      <Box height={50} width={200} ml={2}>
+                        <TextField
+                          label="Price"
+                          type="number"
+                          InputProps={{
+                            startAdornment: (
+                              <InputAdornment position="start">
+                                $
+                              </InputAdornment>
+                            ),
+                          }}
+                          value={buyData.price}
+                          onChange={(e) =>
+                            setBuyData({
+                              ...buyData,
+                              price: e.target.value,
+                            })
+                          }
+                          variant="outlined"
+                          sx={{ width: "100%" }}
+                        />
+                      </Box>
+                    </Box>
+                  ) : (
+                    <></>
+                  )}
+                </Box>
+                {errorMessage !== "" ? (
+                  <Typography sx={{ color: colors.redAccent[500] }}>
+                    {" "}
+                    {errorMessage}{" "}
+                  </Typography>
                 ) : (
-                  <></>
+                  <Box></Box>
                 )}
-              </Box>
-              {errorMessage !== "" ? (
-                <Typography sx={{ color: colors.redAccent[500] }}>
-                  {" "}
-                  {errorMessage}{" "}
-                </Typography>
-              ) : (
-                <Box></Box>
-              )}
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={handleSubmit}
-                sx={{
-                  backgroundColor: colors.blueAccent[600],
-                  color: colors.grey[100],
-                  fontSize: 15,
-                  fontWeight: "bold",
-                  width: "100%",
-                  "&:hover": {
-                    backgroundColor: colors.blueAccent[700],
-                  },
-                  mt: 2,
-                }}
-              >
-                BUY
-              </Button>
-            </DialogContent>
-          </Dialog>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={handleSubmit}
+                  sx={{
+                    backgroundColor: colors.blueAccent[600],
+                    color: colors.grey[100],
+                    fontSize: 15,
+                    fontWeight: "bold",
+                    width: "100%",
+                    "&:hover": {
+                      backgroundColor: colors.blueAccent[700],
+                    },
+                    mt: 2,
+                  }}
+                >
+                  BUY
+                </Button>
+              </DialogContent>
+            </Dialog>
+          </Box>
         </Box>
         <Dialog open={isErrorDialogOpen} onClose={handleTradeDialogClose}>
           {" "}
@@ -577,7 +711,7 @@ const Portfolio = () => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {portfolio.map((data) => (
+              {portfolio.map((data, index) => (
                 <TableRow>
                   <TableCell sx={{ fontSize: "14px" }}>{data.symbol}</TableCell>
                   <TableCell sx={{ fontSize: "14px" }}>
@@ -594,13 +728,13 @@ const Portfolio = () => {
                   </TableCell>
                   <TableCell sx={{ fontSize: "14px" }}>
                     {(() => {
-                      const profitOrLoss = (
+                      const profitOrLoss = parseFloat(
                         parseFloat(data.currentValue) -
-                        parseFloat(data.boughtAt)
+                          parseFloat(data.boughtAt)
                       ).toFixed(2);
 
                       const percent = (
-                        (profitOrLoss / parseFloat(data.boughtAt)) *
+                        parseFloat(profitOrLoss / parseFloat(data.boughtAt)) *
                         100
                       ).toFixed(2);
 
@@ -620,9 +754,10 @@ const Portfolio = () => {
                     <Button
                       onClick={() =>
                         handleSellDialogOpen(
+                          index,
                           data.symbol,
-                          data.held,
-                          data.currentValue
+                          parseFloat(data.held),
+                          parseFloat(data.currentValue)
                         )
                       }
                       sx={{
