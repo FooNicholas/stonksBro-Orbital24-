@@ -17,6 +17,7 @@ import {
 } from "@mui/material";
 import PersonRemoveOutlinedIcon from "@mui/icons-material/PersonRemoveOutlined";
 import CloseIcon from "@mui/icons-material/Close";
+import TradingViewTicker from "../TradingViewWidget/TradingViewTicker";
 
 import Sidebar from "../../scenes/global/Sidebar";
 import Topbar from "../../scenes/global/Topbar";
@@ -36,6 +37,8 @@ const Friends = () => {
     friendUsername: "",
     friendId: "",
   });
+  const [friendDialog, setFriendDialog] = useState(false);
+  const [friendData, setFriendData] = useState({});
 
   useEffect(() => {
     fetchFriends();
@@ -49,7 +52,6 @@ const Friends = () => {
       if (response.ok) {
         const data = await response.json();
         setFriends(data);
-        console.log(data);
       } else {
         console.error("Failed to fetch friends");
       }
@@ -96,6 +98,26 @@ const Friends = () => {
     }
   };
 
+  const handleFriendProfileClose = () => {
+    setFriendDialog(false);
+  };
+
+  const handleOpenProfile = async (friendId) => {
+    try {
+      const response = await fetch(
+        `https://stonks-bro-orbital24-server.vercel.app/friend-profile/${friendId}`
+      );
+      if (response.ok) {
+        const data = await response.json();
+        setFriendDialog(true);
+        setFriendData(data[0] || {});
+        console.log("Successfully fetched friend data");
+      }
+    } catch (error) {
+      console.error("Error fetching friend data:", error);
+    }
+  };
+
   return (
     <ColorModeContext.Provider value={colorMode}>
       <ThemeProvider theme={theme}>
@@ -117,7 +139,6 @@ const Friends = () => {
                         padding: "10px",
                         border: "1px solid #ccc",
                         borderRadius: "10px",
-                        cursor: "pointer",
                         overflowWrap: "break-word",
                         color: "black",
                         height: "300px",
@@ -144,6 +165,7 @@ const Friends = () => {
                         <PersonRemoveOutlinedIcon />
                       </IconButton>
                       <Avatar
+                        onClick={() => handleOpenProfile(friend.id)}
                         src={friend.avatar}
                         alt="Friend"
                         sx={{
@@ -152,6 +174,7 @@ const Friends = () => {
                           borderRadius: "50%",
                           mt: 3,
                           marginBottom: "10px",
+                          cursor: "pointer",
                         }}
                       />
                       <Typography variant="h4">{friend.username}</Typography>
@@ -216,6 +239,161 @@ const Friends = () => {
                 ))}
               </Grid>
             </Box>
+            <Dialog
+              open={friendDialog}
+              onClose={handleFriendProfileClose}
+              maxWidth="md"
+              fullWidth
+              PaperProps={{
+                sx: {
+                  maxHeight: "80vh",
+                  display: "flex",
+                  flexDirection: "column",
+                },
+              }}
+            >
+              <DialogTitle>
+                <Typography fontSize="20px" fontWeight="bold">
+                  FRIEND PROFILE
+                </Typography>
+                <IconButton
+                  aria-label="close"
+                  onClick={handleFriendProfileClose}
+                  sx={{
+                    position: "absolute",
+                    right: 8,
+                    top: 8,
+                    color: (theme) => theme.palette.grey[500],
+                  }}
+                >
+                  <CloseIcon />
+                </IconButton>
+                <Box
+                  sx={{
+                    display: "flex",
+                    flexDirection: "row",
+                    alignItems: "center",
+                  }}
+                >
+                  <Avatar
+                    src={friendData?.avatar || ""}
+                    alt="Friend"
+                    sx={{
+                      width: "150px",
+                      height: "150px",
+                      mt: 2,
+                      mb: 2,
+                      mr: 5,
+                    }}
+                  />
+                  <Typography variant="h1" fontWeight="bold">
+                    {friendData?.username || "Username not available"}
+                  </Typography>
+                </Box>
+              </DialogTitle>
+              <DialogContent
+                sx={{
+                  width: "100%",
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                }}
+              >
+                <Box sx={{ width: "100%" }}>
+                  <Typography variant="h4" fontWeight="bold">
+                    Tickers:
+                  </Typography>
+                  <Box
+                    display="grid"
+                    gridTemplateColumns="repeat(12, 1fr)"
+                    gap="10px"
+                  >
+                    {friendData?.ticker?.length > 0 ? (
+                      friendData.ticker.map((item, index) => (
+                        <Box
+                          key={index}
+                          backgroundColor={colors.blueAccent[600]}
+                          gridColumn="span 3"
+                          display="flex"
+                          alignItems="center"
+                          justifyContent="center"
+                          sx={{ height: "100%", border: 1 }}
+                        >
+                          <TradingViewTicker symbol={item} />
+                        </Box>
+                      ))
+                    ) : (
+                      <Typography>No tickers available</Typography>
+                    )}
+                  </Box>
+                </Box>
+                <Box sx={{ width: "100%", mt: 2 }}>
+                  <Typography variant="h4" fontWeight="bold">
+                    Watchlist:
+                  </Typography>
+                  <Box
+                    display="grid"
+                    gridTemplateColumns="repeat(12, 1fr)"
+                    gap="10px"
+                  >
+                    {friendData?.watchlist?.length > 0 ? (
+                      friendData.watchlist.map((item, index) => (
+                        <Box
+                          key={index}
+                          backgroundColor={colors.blueAccent[600]}
+                          gridColumn="span 3"
+                          display="flex"
+                          alignItems="center"
+                          justifyContent="center"
+                          sx={{ height: "100%", border: 1 }}
+                        >
+                          <TradingViewTicker symbol={item} />
+                        </Box>
+                      ))
+                    ) : (
+                      <Typography>No watchlist available</Typography>
+                    )}
+                  </Box>
+                </Box>
+                <Box sx={{ width: "100%", mt: 2 }}>
+                  <Typography variant="h4" fontWeight="bold">
+                    Portfolio:
+                  </Typography>
+                  <Box
+                    display="grid"
+                    gridTemplateColumns="repeat(12, 1fr)"
+                    gap="10px"
+                  >
+                    {friendData?.trades?.length > 0 ? (
+                      [
+                        ...new Set(
+                          friendData.trades.map((trade) => trade.symbol)
+                        ),
+                      ].map((symbol, index) => {
+                        const trade = friendData.trades.find(
+                          (t) => t.symbol === symbol
+                        );
+                        return (
+                          <Box
+                            key={index}
+                            backgroundColor={colors.blueAccent[600]}
+                            display="flex"
+                            gridColumn="span 3"
+                            alignItems="center"
+                            justifyContent="center"
+                            sx={{ height: "100%", border: 1 }}
+                          >
+                            <TradingViewTicker symbol={symbol} />
+                          </Box>
+                        );
+                      })
+                    ) : (
+                      <Typography>No portfolio available</Typography>
+                    )}
+                  </Box>
+                </Box>
+              </DialogContent>
+            </Dialog>
           </main>
         </div>
       </ThemeProvider>

@@ -5,6 +5,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import { tokens } from "../../theme";
 import { useAuth } from "../AuthContext/AuthContext";
 import { Link } from 'react-router-dom';
+import AutocompleteWatchlist from "./AutocompleteWatchlist";
 
 function TradingViewDashboard() {
   const container = useRef(null);
@@ -163,14 +164,8 @@ function TradingViewDashboard() {
           </IconButton>
         </DialogTitle>
         <DialogContent>
-          <Box sx={{ mb: 2, display: "flex", alignItems: "center" }}>
-            <TextField
-              label="Add Symbol"
-              value={newSymbol}
-              onChange={(e) => setNewSymbol(e.target.value)}
-              variant="outlined"
-              sx={{ mr: 2 }}
-            />
+          <Box sx={{ mt: 1, mb: 2, display: "flex", alignItems: "center" }}>
+            <AutocompleteWatchlist setNewSymbol={setNewSymbol}/>
             <Button
               variant="contained"
               color="primary"
@@ -182,6 +177,7 @@ function TradingViewDashboard() {
                 "&:hover": {
                 backgroundColor: colors.blueAccent[700],
                 },
+                ml: 1,
               }}
             >
               Add

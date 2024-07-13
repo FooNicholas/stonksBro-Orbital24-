@@ -475,8 +475,6 @@ app.get("/get-avatar/:userId", async (req, res) => {
 app.post("/change-avatar", async (req, res) => {
   const { avatar, userId } = req.body;
 
-  const fileName = avatar;
-
   try {
     const { data: icon, error: retrieveIconError } = supabase.storage
       .from("profile_icon")
@@ -777,6 +775,27 @@ app.post("/sell/:userId", async (req, res) => {
     }
 
     res.status(200).json(fetchBalance);
+  } catch (error) {
+    console.error("Server error:", error);
+    res.status(500).send("Internal server error.");
+  }
+});
+
+app.get("/friend-profile/:friendId", async (req, res) => {
+  const { friendId } = req.params;
+
+  try {
+    const { data, error } = await supabase
+      .from("users")
+      .select("username, avatar, ticker, watchlist, trades")
+      .eq("id", friendId);
+
+    if (error) {
+      console.error("Supabase error:", error.message);
+      return res.status(500).send("Internal server error.");
+    }
+
+    return res.status(200).json(data);
   } catch (error) {
     console.error("Server error:", error);
     res.status(500).send("Internal server error.");
