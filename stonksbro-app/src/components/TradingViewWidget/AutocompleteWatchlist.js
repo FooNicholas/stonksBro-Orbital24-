@@ -14,7 +14,7 @@ function sleep(duration) {
   });
 }
 
-export default function AutocompleteBox({ buyData, setBuyData }) {
+export default function AutocompleteWatchlist({ setNewSymbol }) {
   const [open, setOpen] = useState(false);
   const [options, setOptions] = useState([]);
   const loading = open && options.length === 0;
@@ -47,7 +47,7 @@ export default function AutocompleteBox({ buyData, setBuyData }) {
   return (
     <Autocomplete
       disablePortal
-      ListboxProps={{ style: { maxHeight: "15rem" }, position: "bottom-start" }}
+      ListboxProps={{ position: "bottom-start" }}
       open={open}
       onOpen={() => {
         setOpen(true);
@@ -59,13 +59,7 @@ export default function AutocompleteBox({ buyData, setBuyData }) {
       loading={loading}
       getOptionLabel={(option) => option.Name}
       onChange={(event, newValue) => {
-        setBuyData({
-          ...buyData,
-          symbol:
-            newValue.Exchange === "BINANCE"
-              ? "BINANCE:" + newValue.Symbol
-              : newValue.Symbol,
-        });
+        setNewSymbol(newValue.Symbol);
       }}
       renderOption={(props, option) => (
         <Box component="li" {...props} sx={{ flexDirection: "row" }}>
@@ -84,11 +78,11 @@ export default function AutocompleteBox({ buyData, setBuyData }) {
           <Box>{option.Exchange}</Box>
         </Box>
       )}
-      sx={{ width: 300 }}
+      sx={{ width: 250 }}
       renderInput={(params) => (
         <TextField
           {...params}
-          label="Buy Symbol"
+          label="Add Symbol"
           InputProps={{
             ...params.InputProps,
             endAdornment: (

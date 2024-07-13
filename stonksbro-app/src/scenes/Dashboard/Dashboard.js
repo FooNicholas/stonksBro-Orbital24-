@@ -16,8 +16,14 @@ import {
   useTheme,
   CssBaseline,
   ThemeProvider,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  IconButton,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
+import CloseIcon from "@mui/icons-material/Close";
 
 const Dashboard = () => {
   const colorTheme = useTheme();
@@ -30,15 +36,20 @@ const Dashboard = () => {
   // State for each ticker symbol
   const [symbols, setSymbols] = useState([]);
 
+  const [openDialog, setOpenDialog] = useState(false);
+  const [dialogMessage, setDialogMessage] = useState("");
+
   useEffect(() => {
     const fetchTickerSymbol = async () => {
       try {
-        const response = await fetch(`https://stonks-bro-orbital24-server.vercel.app/ticker/${userId}`);
+        const response = await fetch(
+          `https://stonks-bro-orbital24-server.vercel.app/ticker/${userId}`
+        );
         if (response.ok) {
           const data = await response.json();
           if (Array.isArray(data)) {
             setSymbols(data);
-            console.log("Successfully fetched tickers")
+            console.log("Successfully fetched tickers");
           } else {
             console.error("Invalid data format: expected an array");
           }
@@ -49,13 +60,13 @@ const Dashboard = () => {
         console.error("Error fetching ticker symbols:", error);
       }
     };
-    
+
     fetchTickerSymbol();
-    
   }, [userId]);
 
   const handleSymbolChange = (e, index) => {
     const { value } = e.target;
+
     setSymbols((prevSymbols) => {
       const newSymbols = [...prevSymbols];
       newSymbols[index] = value;
@@ -65,16 +76,19 @@ const Dashboard = () => {
 
   const handleTickerChange = async () => {
     try {
-      const response = await fetch(`https://stonks-bro-orbital24-server.vercel.app/update-ticker`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          userId: userId,
-          symbols: symbols,
-        }),
-      });
+      const response = await fetch(
+        `https://stonks-bro-orbital24-server.vercel.app/update-ticker`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            userId: userId,
+            symbols: symbols,
+          }),
+        }
+      );
 
       if (response.ok) {
         console.log("successfully updated tickers ");
@@ -88,6 +102,12 @@ const Dashboard = () => {
 
   const toggleEdit = () => {
     if (isEditing) {
+      const hasEmptySymbol = symbols.some((symbol) => symbol.trim() === "");
+      if (hasEmptySymbol) {
+        setDialogMessage("Ticker symbols cannot be empty.");
+        setOpenDialog(true);
+        return;
+      }
       handleTickerChange();
     }
     setIsEditing(!isEditing);
@@ -150,10 +170,11 @@ const Dashboard = () => {
                   >
                     {isEditing ? (
                       <TextField
+                        required
+                        label="Required"
                         variant="outlined"
                         value={symbol}
                         onChange={(e) => handleSymbolChange(e, index)}
-                        sx={{ border: 1 }}
                       />
                     ) : (
                       <TradingViewTicker symbol={symbols[index]} />
@@ -248,6 +269,35 @@ const Dashboard = () => {
               </Box>
             </Box>
           </main>
+          <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
+            <DialogTitle>
+              <Typography fontSize="20px" fontWeight="bold">
+                {" "}
+                WARNING{" "}
+              </Typography>
+              <IconButton
+                aria-label="close"
+                onClick={() => setOpenDialog(false)}
+                sx={{
+                  position: "absolute",
+                  right: 8,
+                  top: 8,
+                  color: (theme) => theme.palette.grey[500],
+                }}
+              >
+                <CloseIcon />
+              </IconButton>
+            </DialogTitle>
+            <DialogContent>
+              <Typography
+                sx={{
+                  color: colors.redAccent[500],
+                }}
+              >
+                {dialogMessage}
+              </Typography>
+            </DialogContent>
+          </Dialog>
         </div>
       </ThemeProvider>
     </ColorModeContext.Provider>
