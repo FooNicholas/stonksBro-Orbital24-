@@ -835,7 +835,7 @@ export const AutocompleteData = [
     Exchange: "NASDAQ",
   },
   {
-    Symbol: "GOOGL",
+    Symbol: "GOOG",
     Name: "Alphabet Inc. Class A Common Stock",
     Exchange: "NASDAQ",
   },

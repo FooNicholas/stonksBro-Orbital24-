@@ -90,7 +90,7 @@ export default function AutocompleteNews({ setQuery }) {
       renderInput={(params) => (
         <TextField
           {...params}
-          label="Add Symbol"
+          label="Search News"
           InputProps={{
             ...params.InputProps,
             endAdornment: (
