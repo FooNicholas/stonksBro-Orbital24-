@@ -200,18 +200,18 @@ const Navbar = () => {
             </Typography>
             <Item
               title="News"
-              //to="/form"
+              to="/news"
               icon={<NewspaperIcon />}
               selected={selected}
               setSelected={setSelected}
             />
-            <Item
+            {/* <Item
               title="Calendar"
               //to="/calendar"
               icon={<CalendarTodayOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
-            />
+            /> */}
             <Item
               title="Trading Simulator"
               to="/simulator"

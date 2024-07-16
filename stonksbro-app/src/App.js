@@ -10,6 +10,7 @@ import Profile from "./components/Profile/Profile";
 import Friends from "./components/FriendsList/FriendsList";
 import AddFriends from "./components/AddFriends/AddFriends";
 import TradingSimulator from "./components/TradingSimulator/TradingSimulator";
+import News from "./scenes/NewsPage/NewsPage";
 
 import "./index.css";
 
@@ -38,7 +39,7 @@ function App() {
               </ProtectedRoute>
             }
           />
-          <Route 
+          <Route
             path="/friends"
             element={
               <ProtectedRoute>
@@ -46,7 +47,7 @@ function App() {
               </ProtectedRoute>
             }
           />
-          <Route 
+          <Route
             path="/add"
             element={
               <ProtectedRoute>
@@ -54,7 +55,7 @@ function App() {
               </ProtectedRoute>
             }
           />
-          <Route 
+          <Route
             path="/simulator"
             element={
               <ProtectedRoute>
@@ -62,7 +63,14 @@ function App() {
               </ProtectedRoute>
             }
           />
-
+          <Route
+            path="/news"
+            element={
+              <ProtectedRoute>
+                <News />
+              </ProtectedRoute>
+            }
+          />
         </Routes>
       </AuthProvider>
     </Router>

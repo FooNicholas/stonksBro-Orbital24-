@@ -4,7 +4,7 @@ import { useAuth } from "../../components/AuthContext/AuthContext";
 import Header from "../../components/Header/Header";
 import Topbar from "../global/Topbar";
 import Sidebar from "../global/Sidebar";
-import stonksBroIcon from "../../components/Assets/stonksBro-logo.png";
+import stonksBroIcon from "../../components/Assets/stonksBro-icon.png";
 import {
   Box,
   Button,
@@ -15,6 +15,8 @@ import {
   ThemeProvider,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
+
+import AutocompleteNews from "./AutocompleteNews";
 
 const NewsPage = () => {
   const colorTheme = useTheme();
@@ -30,7 +32,7 @@ const NewsPage = () => {
 
   const handleSearch = async () => {
     const apiKey = process.env.REACT_APP_ALPHAVANTAGE_API_KEY;
-    const url = `https://www.alphavantage.co/query?function=NEWS_SENTIMENT&tickers=${query}&apikey=${apiKey}`;
+    const url = `https://www.alphavantage.co/query?function=NEWS_SENTIMENT&tickers=${query.symbol}&apikey=${apiKey}`;
 
     try {
       const response = await fetch(url);
@@ -62,27 +64,20 @@ const NewsPage = () => {
             <Box m="15px">
               <Box>
                 <Header title="NEWS SEARCH" />
-                <Box mt={2} display="flex" alignItems="center">
-                  <TextField
-                    label="Enter stock symbols (e.g., MSFT, NVDA)"
-                    value={query}
-                    onChange={(e) => setQuery(e.target.value)}
-                    fullWidth
-                    margin="normal"
-                    sx={{ width: "25%", marginRight: "10px" }}
-                  />
+                <Box mt={2} display="flex" alignItems="center" >
+                  <AutocompleteNews setQuery={setQuery}/>
                   <Button
                     sx={{
                       backgroundColor: colors.blueAccent[600],
                       color: colors.grey[100],
                       fontSize: "15px",
                       fontWeight: "bold",
-                      marginTop: "8px",
                       width: "120px",
                       height: "53px",
                       "&:hover": {
                         backgroundColor: colors.blueAccent[700],
                       },
+                      ml: 2,
                     }}
                     onClick={handleSearch}
                   >
