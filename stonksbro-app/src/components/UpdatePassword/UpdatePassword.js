@@ -5,6 +5,7 @@ import MessageBox from "../MessageBox/MessageBox";
 
 import password_icon from "../Assets/password.png";
 import logo_icon from "../Assets/stonksBro-icon.png";
+import stock_image from "../Assets/stocksimage.jpg";
 
 const UpdatePassword = () => {
   const [errorMessage, setErrorMessage] = useState("");
@@ -15,10 +16,9 @@ const UpdatePassword = () => {
   const query = new URLSearchParams(location.search);
   const token = query.get("token");
 
-
   const [formData, setFormData] = useState({
     password: "",
-    passwordConfirm: ""
+    passwordConfirm: "",
   });
 
   const handleChange = (e) => {
@@ -43,13 +43,19 @@ const UpdatePassword = () => {
     }
 
     try {
-      const response = await fetch("https://stonks-bro-orbital24-server.vercel.app/update-password", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ token: token, newPassword: formData.password }),
-      });
+      const response = await fetch(
+        "https://stonks-bro-orbital24-server.vercel.app/update-password",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            token: token,
+            newPassword: formData.password,
+          }),
+        }
+      );
 
       if (response.ok) {
         setSuccessMessage("Password updated successfully.");
@@ -68,51 +74,70 @@ const UpdatePassword = () => {
   };
 
   return (
-    <>
-      <div className="header-icon">
-        <img src={logo_icon} alt="stonksBro"></img>
+    <div className="update-container">
+      <div className="left-side">
+        <img src={stock_image} alt="Stock" className="stock-image" />
       </div>
-      <div className="container">
-        <div className="header">
-          <div className="text"> Update Password </div>
-          <div className="underline"></div>
+      <div className="right-side">
+        <div className="header-icon">
+          <img src={logo_icon} alt="stonksBro" />
         </div>
-
-        <form onSubmit={handleUpdatePassword}>
-          <div className="inputs">
-            <div className="input">
-              <img src={password_icon} alt="password_icon" />
-              <input 
-                type="password" 
-                placeholder="New Password"
-                name="password" 
-                value={formData.password}
-                onChange={handleChange}/>
-            </div>
-            <div className="input">
-              <img src={password_icon} alt="password_icon" />
-              <input 
-                type="password"
-                placeholder="Confirm Password"
-                name="passwordConfirm" 
-                value={formData.passwordConfirm}
-                onChange={handleChange}/>
-            </div>
+        <div className="container">
+          <div className="header">
+            <div className="text"> Update Password </div>
+            <div className="underline"></div>
           </div>
-          
-          <div className="submit-container">
-            <button type="submit" className="submit"> Update Password </button>
-          </div>
-        </form>
 
-        <div className="create-account">                   
-          Go back? <span onClick={() => navigate("/")}> Click Here! </span>
+          <form onSubmit={handleUpdatePassword}>
+            <div className="inputs">
+              <div className="input">
+                <img src={password_icon} alt="password_icon" />
+                <input
+                  type="password"
+                  placeholder="New Password"
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                />
+              </div>
+              <div className="input">
+                <img src={password_icon} alt="password_icon" />
+                <input
+                  type="password"
+                  placeholder="Confirm Password"
+                  name="passwordConfirm"
+                  value={formData.passwordConfirm}
+                  onChange={handleChange}
+                />
+              </div>
+            </div>
+
+            <div className="submit-container">
+              <button type="submit" className="submit">
+                Update Password
+              </button>
+            </div>
+          </form>
+
+          <div className="back">
+            Go back? <span onClick={() => navigate("/")}>Click Here!</span>
+          </div>
         </div>
+        {errorMessage && (
+          <MessageBox
+            message={errorMessage}
+            onClose={() => setErrorMessage("")}
+          />
+        )}
+        {successMessage && (
+          <MessageBox
+            message={successMessage}
+            onClose={() => setSuccessMessage("")}
+          />
+        )}
       </div>
-      {errorMessage && <MessageBox message={errorMessage} onClose={() => setErrorMessage("")} />}
-      {successMessage && <MessageBox message={successMessage} onClose={() => setSuccessMessage("")} />}
-    </>
-  )
-}
+    </div>
+  );
+};
 
 export default UpdatePassword;
