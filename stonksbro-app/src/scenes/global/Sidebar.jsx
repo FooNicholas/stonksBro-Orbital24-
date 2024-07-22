@@ -1,6 +1,19 @@
 import { useState, useEffect } from "react";
 import { Sidebar, Menu, MenuItem } from "react-pro-sidebar";
-import { Box, Icon, IconButton, Typography, useTheme } from "@mui/material";
+import { 
+  Box, 
+  Icon, 
+  IconButton, 
+  Typography, 
+  useTheme, 
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle, 
+  Avatar, 
+  Button,
+} from "@mui/material";
+
 import { Link } from "react-router-dom";
 import { tokens } from "../../theme";
 import { useAuth } from "../../components/AuthContext/AuthContext";
@@ -18,6 +31,7 @@ import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
 import StackedLineChartIcon from "@mui/icons-material/StackedLineChart";
 import BalanceIcon from "@mui/icons-material/Balance";
 import TvIcon from "@mui/icons-material/Tv";
+import { ThemeProvider } from "@emotion/react";
 
 const Item = ({ title, to, icon, selected, setSelected }) => {
   const theme = useTheme();
@@ -47,12 +61,16 @@ const Item = ({ title, to, icon, selected, setSelected }) => {
 };
 
 const Navbar = () => {
-  const theme = useTheme();
-  const colors = tokens(theme.palette.mode);
+  const colorTheme = useTheme();
+  const colors = tokens(colorTheme.palette.mode);
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [selected, setSelected] = useState("Dashboard");
   const { username, userId } = useAuth();
+
   const [avatarURL, setAvatarURL] = useState("");
+  const [selectedIcon, setSelectedIcon] = useState("");
+  const presetIcons = ["dog", "dog_1", "cat", "panda", "rabbit"];
+  const [isIconPromptVisible, setIconPromptVisible] = useState(false);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -80,6 +98,45 @@ const Navbar = () => {
     handleGetAvatar();
     return () => controller.abort();
   });
+
+  const handleIconClick = (icon) => {
+    setSelectedIcon(icon);
+  };
+
+  const handleChangeAvatarClose = () => {
+    setSelectedIcon("");
+    setIconPromptVisible(false);
+  }
+
+  const handleChangeAvatar = async () => {
+    setIconPromptVisible(false);
+    try {
+      const response = await fetch(
+        "https://stonks-bro-orbital24-server.vercel.app/change-avatar",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            avatar: selectedIcon,
+            userId: userId,
+          }),
+        }
+      );
+
+      if (response.ok) {
+        console.log("Avatar updated successfully");
+        const data = await response.text();
+        setAvatarURL(data.avatar);
+        setSelectedIcon("");
+      } else {
+        console.error("Failed to change avatar");
+      }
+    } catch (error) {
+      console.error("Error changing avatar:", error);
+    }
+  };
 
   return (
     <Box
@@ -132,13 +189,24 @@ const Navbar = () => {
           {!isCollapsed && (
             <Box mb="25px">
               <Box display="flex" justifyContent="center" alignItems="center">
-                <img
+                <Avatar
+                  src={avatarURL}
+                  alt="Avatar"
+                  onClick={() => setIconPromptVisible(!isIconPromptVisible)}
+                  sx={{
+                    width: "150px",
+                    height: "150px",
+                    cursor: "pointer",
+                  }}
+                />
+                
+                {/* <img
                   alt="profile-user"
                   width="100px"
                   height="100px"
                   src={avatarURL}
                   style={{ cursor: "pointer", borderRadius: "50%" }}
-                />
+                /> */}
               </Box>
               <Box textAlign="center">
                 <Typography
@@ -150,6 +218,47 @@ const Navbar = () => {
                   {username}
                 </Typography>
               </Box>
+              <Dialog
+                open={isIconPromptVisible}
+                onClose={() => handleChangeAvatarClose()}
+              >
+                <DialogTitle>Choose an Avatar</DialogTitle>
+                <DialogContent>
+                  <Box display="flex" justifyContent="center" flexWrap="wrap">
+                    {presetIcons.map((icon, index) => (
+                      <Box
+                        key={index}
+                        sx={{
+                          m: 1,
+                          border: selectedIcon === icon
+                              ? `2px solid ${colors.blueAccent[600]}`
+                              : "none",
+                          borderRadius: "50%",
+                          padding: "5px",
+                        }}
+                      >
+                        <Avatar
+                          src={require(`../../components/Assets/avatar/${icon}.png`)}
+                          alt={`icon-${index}`}
+                          sx={{ cursor: "pointer", width: 70, height: 70 }}
+                          onClick={() => handleIconClick(icon)}
+                        />
+                      </Box>
+                    ))}
+                  </Box>
+                </DialogContent>
+                <DialogActions>
+                  <Button onClick={handleChangeAvatar} color="secondary">
+                    Save
+                  </Button>
+                  <Button
+                    onClick={() => handleChangeAvatarClose()}
+                    color="secondary"
+                  >
+                    Cancel
+                  </Button>
+                </DialogActions>
+              </Dialog>
             </Box>
           )}
 
@@ -169,13 +278,6 @@ const Navbar = () => {
             >
               Data
             </Typography>
-            <Item
-              title="Profile"
-              to="/profile"
-              icon={<PersonOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-            />
             <Item
               title="Friends"
               to="/friends"
@@ -205,13 +307,13 @@ const Navbar = () => {
               selected={selected}
               setSelected={setSelected}
             />
-            <Item
+            {/* <Item
               title="Calendar"
               //to="/calendar"
               icon={<CalendarTodayOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
-            />
+            /> */}
             <Item
               title="Trading Simulator"
               to="/simulator"
@@ -258,6 +360,7 @@ const Navbar = () => {
           </Box>
         </Menu>
       </Sidebar>
+      
     </Box>
   );
 };

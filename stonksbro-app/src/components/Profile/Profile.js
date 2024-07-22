@@ -245,8 +245,7 @@ const Profile = () => {
                     maxHeight: "550px",
                     overflow: "auto",
                   }}
-                >
-                </Box>
+                ></Box>
               </Box>
 
               <Dialog

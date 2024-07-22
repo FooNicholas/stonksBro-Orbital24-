@@ -6,7 +6,6 @@ import Dashboard from "./scenes/Dashboard/Dashboard";
 import ProtectedRoute from "./components/ProtectedRoute/ProtectedRoute";
 import Reset from "./components/Reset/Reset";
 import UpdatePassword from "./components/UpdatePassword/UpdatePassword";
-import Profile from "./components/Profile/Profile";
 import Friends from "./components/FriendsList/FriendsList";
 import AddFriends from "./components/AddFriends/AddFriends";
 import TradingSimulator from "./components/TradingSimulator/TradingSimulator";
@@ -27,14 +26,6 @@ function App() {
             element={
               <ProtectedRoute>
                 <Dashboard />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/profile"
-            element={
-              <ProtectedRoute>
-                <Profile />
               </ProtectedRoute>
             }
           />
