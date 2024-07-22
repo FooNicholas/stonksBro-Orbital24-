@@ -745,7 +745,8 @@ const Portfolio = () => {
                         </Typography>
                       ) : (
                         <Typography color={colors.redAccent[500]}>
-                          -${Math.abs(profitOrLoss)} ({percent}%)
+                          -${(Math.abs(profitOrLoss) * data.held).toFixed(2)} (
+                          {percent}%)
                         </Typography>
                       );
                     })()}
