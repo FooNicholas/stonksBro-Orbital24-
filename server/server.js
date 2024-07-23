@@ -22,6 +22,8 @@ const api_key = finnhub.ApiClient.instance.authentications["api_key"];
 api_key.apiKey = process.env.FINNHUB_API_KEY;
 const finnhubClient = new finnhub.DefaultApi();
 
+const NEWSAPI_KEY = process.env.NEWSAPI_KEY;
+
 const supabaseURL = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_KEY;
 const supabase = createClient(supabaseURL, supabaseKey);
@@ -798,6 +800,25 @@ app.get("/friend-profile/:friendId", async (req, res) => {
     return res.status(200).json(data);
   } catch (error) {
     console.error("Server error:", error);
+    res.status(500).send("Internal server error.");
+  }
+});
+
+app.get("/news/:symbol", async (req, res) => {
+  const { symbol } = req.params;
+  try {
+    const response = await fetch(
+      `https://newsapi.org/v2/everything?q=${symbol}&apiKey=${NEWSAPI_KEY}`
+    );
+    if (response.ok) {
+      const data = await response.json();
+      const news = data.articles;
+      res.status(200).send(news.slice(0, 40));
+    } else {
+      console.error("Error fetching news from NewsAPI:", error);
+      res.status(500).send("Internal server error.");
+    }
+  } catch (error) {
     res.status(500).send("Internal server error.");
   }
 });

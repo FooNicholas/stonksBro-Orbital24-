@@ -7,6 +7,7 @@ import MessageBox from "../MessageBox/MessageBox";
 import email_icon from "../Assets/email.png";
 import password_icon from "../Assets/password.png";
 import logo_icon from "../Assets/stonksBro-icon.png";
+import stock_image from "../Assets/stocksimage.jpg";
 
 const Login = () => {
   const { login } = useAuth();
@@ -80,58 +81,66 @@ const Login = () => {
   };
 
   return (
-    <div>
-      <div className="header-icon">
-        <img src={logo_icon} alt="stonksBro"></img>
+    <div className="login-container">
+      <div className="left-side">
+        <img src={stock_image} alt="Stock" className="stock-image" />
       </div>
-      <div className="container">
-        <div className="header">
-          <div className="text"> Login </div>
-          <div className="underline"></div>
+      <div className="right-side">
+        <div className="header-icon">
+          <img src={logo_icon} alt="stonksBro" />
         </div>
+        <div className="container">
+          <div className="header">
+            <div className="text"> Login </div>
+            <div className="underline"></div>
+          </div>
 
-        <form onSubmit={handleSubmit}>
-          <div className="inputs">
-            <div className="input">
-              <img src={email_icon} alt="email_icon" />
-              <input
-                type="email"
-                placeholder="Email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-              />
+          <form onSubmit={handleSubmit}>
+            <div className="inputs">
+              <div className="input">
+                <img src={email_icon} alt="email_icon" />
+                <input
+                  type="email"
+                  placeholder="Email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                />
+              </div>
+              <div className="input">
+                <img src={password_icon} alt="password_icon" />
+                <input
+                  type="password"
+                  placeholder="Password"
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                />
+              </div>
             </div>
-            <div className="input">
-              <img src={password_icon} alt="password_icon" />
-              <input
-                type="password"
-                placeholder="Password"
-                name="password"
-                value={formData.password}
-                onChange={handleChange}
-              />
+
+            <div className="forgot-password" onClick={navigateToReset}>
+              Lost Password? <span> Click Here!</span>
             </div>
-          </div>
 
-          <div className="forgot-password">
-            Lost Password? <span onClick={navigateToReset}> Click Here!</span>
-          </div>
+            <div className="submit-container">
+              <button type="submit" className="submit">
+                {" "}
+                Login{" "}
+              </button>
+            </div>
+          </form>
 
-          <div className="submit-container">
-            <button type="submit" className="submit">
-              {" "}
-              Login{" "}
-            </button>
+          <div className="create-account">
+            Don't have an account?{" "}
+            <span onClick={navigateToRegister}> Click Here to Register! </span>
           </div>
-        </form>
-
-        <div className="create-account">
-          Don"t have an account?{" "}
-          <span onClick={navigateToRegister}> Click Here to Register! </span>
         </div>
+        <MessageBox
+          message={errorMessage}
+          onClose={() => setErrorMessage("")}
+        />
       </div>
-      <MessageBox message={errorMessage} onClose={() => setErrorMessage("")} />
     </div>
   );
 };

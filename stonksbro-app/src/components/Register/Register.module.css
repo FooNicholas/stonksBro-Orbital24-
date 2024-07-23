@@ -3,15 +3,15 @@ body {
   height: 100%;
   margin: 0;
   padding: 0;
-  overflow: hidden; /* Prevent scrolling */
+  overflow-y: hidden;
 }
 
-.login-container {
+.registerContainer {
   display: flex;
   height: 100vh;
 }
 
-.left-side {
+.leftSide {
   flex: 3;
   display: flex;
   justify-content: center;
@@ -20,20 +20,23 @@ body {
   height: 100%;
 }
 
-.stock-image {
+.stockImage {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
 
-.right-side {
-  flex: 2;
+.rightSide {
   flex-direction: column;
+  display: flex;
   justify-content: center;
   align-items: center;
+  height: 100%;
+  min-width: 768px;
 }
 
-.header-icon {
+.headerIcon {
+  margin-top: 50px;
   height: 100px;
   width: 400px;
   display: flex;
@@ -43,10 +46,8 @@ body {
 .container {
   display: flex;
   flex-direction: column;
-  width: 100%;
   max-width: 500px;
-  background: #c0c0c0;
-  padding: 30px;
+  padding: 50px;
 }
 
 .header {
@@ -100,17 +101,10 @@ body {
   font-size: 19px;
 }
 
-.forgot-password {
-  color: #797979;
-  font-size: 19px;
-  text-align: left;
-  cursor: pointer;
-}
-
-.submit-container {
+.submitContainer {
   display: flex;
   justify-content: center;
-  margin: 40px auto;
+  margin: 25px auto;
 }
 
 .submit {
@@ -132,14 +126,14 @@ body {
   color: #797979;
 }
 
-.create-account {
+.loginAccount {
   text-align: center;
   color: #797979;
   font-size: 19px;
-  margin-top: 20px;
+  margin-top: 10px;
 }
 
-.create-account span {
+.loginAccount span {
   color: black;
   cursor: pointer;
 }

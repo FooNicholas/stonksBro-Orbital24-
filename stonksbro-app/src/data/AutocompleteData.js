@@ -835,7 +835,7 @@ export const AutocompleteData = [
     Exchange: "NASDAQ",
   },
   {
-    Symbol: "GOOGL",
+    Symbol: "GOOG",
     Name: "Alphabet Inc. Class A Common Stock",
     Exchange: "NASDAQ",
   },
@@ -10655,11 +10655,6 @@ export const AutocompleteData = [
     Exchange: "NYSE",
   },
   {
-    Symbol: "WLYB",
-    Name: "John Wiley & Sons Inc. Common Stock",
-    Exchange: "NYSE",
-  },
-  {
     Symbol: "JNJ",
     Name: "Johnson & Johnson Common Stock",
     Exchange: "NYSE",
@@ -12467,16 +12462,6 @@ export const AutocompleteData = [
   {
     Symbol: "MMT",
     Name: "MFS Multimarket Income Trust Common Stock",
-    Exchange: "NYSE",
-  },
-  {
-    Symbol: "CMU",
-    Name: "MFS Municipal Income Trust Common Stock",
-    Exchange: "NYSE",
-  },
-  {
-    Symbol: "MFM",
-    Name: "MFS Municipal Income Trust Common Stock",
     Exchange: "NYSE",
   },
   {

@@ -14,6 +14,7 @@ import {
   useTheme,
   CssBaseline,
   ThemeProvider,
+  CircularProgress,
 } from "@mui/material";
 
 import Sidebar from "../../scenes/global/Sidebar";
@@ -31,10 +32,12 @@ const AddFriends = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [message, setMessage] = useState("");
   const [friendRequests, setFriendRequests] = useState([]);
+  const [loading, setLoading] = useState(true);
   const { userId, username } = useAuth();
 
   useEffect(() => {
     const fetchFriendRequests = async () => {
+      setLoading(true); // Start loading
       try {
         const response = await fetch(
           `https://stonks-bro-orbital24-server.vercel.app/friend-requests/${userId}`
@@ -47,11 +50,13 @@ const AddFriends = () => {
         }
       } catch (error) {
         console.error("Error fetching friend requests:", error);
+      } finally {
+        setLoading(false); // Stop loading
       }
     };
 
     fetchFriendRequests();
-  }, [friendRequests]);
+  }, [userId]);
 
   const handleSearch = (e) => {
     setSearchQuery(e.target.value);
@@ -205,7 +210,16 @@ const AddFriends = () => {
                   height: "70vh",
                 }}
               >
-                {friendRequests.length > 0 ? (
+                {loading ? (
+                  <Box
+                    display="flex"
+                    justifyContent="center"
+                    alignItems="center"
+                    height="600px"
+                  >
+                    <CircularProgress />
+                  </Box>
+                ) : friendRequests.length > 0 ? (
                   <List>
                     {friendRequests.map((request) => (
                       <ListItem
