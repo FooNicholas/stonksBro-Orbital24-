@@ -92,7 +92,7 @@ const Reset = () => {
             </div>
             <div className="submit-container">
               <button type="submit" className="submit">
-                Reset Password
+                Confirm
               </button>
             </div>
           </form>

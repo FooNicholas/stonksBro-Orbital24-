@@ -185,7 +185,7 @@ const UpdatePassword = () => {
 
             <div className="submit-container">
               <button type="submit" className="submit">
-                Update Password
+                Submit
               </button>
             </div>
           </form>
