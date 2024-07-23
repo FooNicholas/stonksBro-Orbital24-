@@ -22,6 +22,7 @@ import {
   MenuItem,
   FormControl,
   InputAdornment,
+  CircularProgress,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import CloseIcon from "@mui/icons-material/Close";
@@ -37,6 +38,10 @@ const Portfolio = () => {
   const [portfolio, setPortfolio] = useState([]);
   const [totalCurrentValue, setTotalCurrentValue] = useState(0);
   const [accountBalance, setAccountBalance] = useState(0);
+  
+  const [portfolioLoading, setPortfolioLoading] = useState(true);
+  const [accountBalanceLoading, setAccountBalanceLoading] = useState(true);
+  const [totalValueLoading, setTotalValueLoading] = useState(true);
 
   const [isSellDialogOpen, setIsSellDialogOpen] = useState(false);
   const [isTradeDialogOpen, setIsTradeDialogOpen] = useState(false);
@@ -253,6 +258,7 @@ const Portfolio = () => {
         setPortfolio(data[0].trades);
         fetchRealTimePrices(data[0].trades);
         setAccountBalance(data[0].balance);
+        setPortfolioLoading(false);
       } else {
         console.error("Failed to fetch portfolio");
       }
@@ -745,7 +751,8 @@ const Portfolio = () => {
                         </Typography>
                       ) : (
                         <Typography color={colors.redAccent[500]}>
-                          -${Math.abs(profitOrLoss)} ({percent}%)
+                          -${(Math.abs(profitOrLoss) * data.held).toFixed(2)} (
+                          {percent}%)
                         </Typography>
                       );
                     })()}

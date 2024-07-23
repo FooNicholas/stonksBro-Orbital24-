@@ -63,8 +63,9 @@ export default function AutocompleteNews({ setQuery }) {
           symbol:
             newValue && newValue.Symbol
               ? newValue.Exchange === "BINANCE"
-                ? "CRYPTO:" +
-                  (newValue.Symbol ? newValue.Symbol.replace("USDT", "") : "")
+                ? newValue.Symbol
+                  ? newValue.Symbol.replace("USDT", "")
+                  : ""
                 : newValue.Symbol
               : "",
         });

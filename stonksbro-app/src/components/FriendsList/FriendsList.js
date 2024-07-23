@@ -14,6 +14,7 @@ import {
   Dialog,
   DialogContent,
   DialogTitle,
+  CircularProgress,
 } from "@mui/material";
 import PersonRemoveOutlinedIcon from "@mui/icons-material/PersonRemoveOutlined";
 import CloseIcon from "@mui/icons-material/Close";
@@ -39,6 +40,7 @@ const Friends = () => {
   });
   const [friendDialog, setFriendDialog] = useState(false);
   const [friendData, setFriendData] = useState({});
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetchFriends();
@@ -52,6 +54,7 @@ const Friends = () => {
       if (response.ok) {
         const data = await response.json();
         setFriends(data);
+        setLoading(false);
       } else {
         console.error("Failed to fetch friends");
       }
@@ -130,114 +133,128 @@ const Friends = () => {
               <Header title="FRIENDS" />
             </Box>
             <Box m="15px">
-              <Grid container spacing={1}>
-                {friends.map((friend) => (
-                  <Grid item key={friend.id} xs={12} sm={6} md={4} lg={3}>
-                    <Box
-                      sx={{
-                        textAlign: "center",
-                        padding: "10px",
-                        border: "1px solid #ccc",
-                        borderRadius: "10px",
-                        overflowWrap: "break-word",
-                        color: "black",
-                        height: "300px",
-                        display: "flex",
-                        flexDirection: "column",
-                        alignItems: "center",
-                        position: "relative",
-                      }}
-                    >
-                      <IconButton
-                        onClick={() =>
-                          handleDeleteDialogOpen(friend.username, friend.id)
-                        }
+              {loading ? (
+                <Box
+                  display="flex"
+                  justifyContent="center"
+                  alignItems="center"
+                  height="600px"
+                  justifySelf="center"
+                >
+                  <CircularProgress />
+                </Box>
+              ) : friends.length > 0 ? (
+                <Grid container spacing={1}>
+                  {friends.map((friend) => (
+                    <Grid item key={friend.id} xs={12} sm={6} md={4} lg={3}>
+                      <Box
                         sx={{
-                          position: "absolute",
-                          top: 8,
-                          right: 16,
-                          color: colors.redAccent[500],
-                          "&:hover": {
-                            color: colors.redAccent[700],
-                          },
+                          textAlign: "center",
+                          padding: "10px",
+                          border: "1px solid #ccc",
+                          borderRadius: "10px",
+                          overflowWrap: "break-word",
+                          color: "black",
+                          height: "300px",
+                          display: "flex",
+                          flexDirection: "column",
+                          alignItems: "center",
+                          position: "relative",
                         }}
                       >
-                        <PersonRemoveOutlinedIcon />
-                      </IconButton>
-                      <Avatar
-                        onClick={() => handleOpenProfile(friend.id)}
-                        src={friend.avatar}
-                        alt="Friend"
-                        sx={{
-                          width: "200px",
-                          height: "200px",
-                          borderRadius: "50%",
-                          mt: 3,
-                          marginBottom: "10px",
-                          cursor: "pointer",
-                        }}
-                      />
-                      <Typography variant="h4">{friend.username}</Typography>
-                    </Box>
-                    <Dialog
-                      open={deleteDialog}
-                      onClose={handleDeleteDialogClose}
-                    >
-                      <DialogTitle>
-                        <Typography fontSize="20px" fontWeight="bold">
-                          {" "}
-                          CONFIRMATION{" "}
-                        </Typography>
                         <IconButton
-                          aria-label="close"
-                          onClick={handleDeleteDialogClose}
-                          sx={{
-                            position: "absolute",
-                            right: 8,
-                            top: 8,
-                            color: (theme) => theme.palette.grey[500],
-                          }}
-                        >
-                          <CloseIcon />
-                        </IconButton>
-                      </DialogTitle>
-                      <DialogContent>
-                        <Typography>
-                          {" "}
-                          You are about to remove {
-                            removeFriend.friendUsername
-                          }{" "}
-                          as friend.
-                        </Typography>
-                        <Typography>
-                          {" "}
-                          This action is irreversible. Are you sure?
-                        </Typography>
-                        <Button
                           onClick={() =>
-                            handleRemoveFriend(removeFriend.friendId)
+                            handleDeleteDialogOpen(friend.username, friend.id)
                           }
                           sx={{
-                            backgroundColor: colors.redAccent[600],
-                            color: colors.grey[100],
-                            fontSize: "15px",
-                            fontWeight: "bold",
-                            padding: "5px",
+                            position: "absolute",
+                            top: 8,
+                            right: 16,
+                            color: colors.redAccent[500],
                             "&:hover": {
-                              backgroundColor: colors.redAccent[700],
+                              color: colors.redAccent[700],
                             },
-                            width: "100%",
-                            mt: 2,
                           }}
                         >
-                          {" "}
-                          REMOVE
-                        </Button>
-                      </DialogContent>
-                    </Dialog>
-                  </Grid>
-                ))}
-              </Grid>
+                          <PersonRemoveOutlinedIcon />
+                        </IconButton>
+                        <Avatar
+                          onClick={() => handleOpenProfile(friend.id)}
+                          src={friend.avatar}
+                          alt="Friend"
+                          sx={{
+                            width: "200px",
+                            height: "200px",
+                            borderRadius: "50%",
+                            mt: 3,
+                            marginBottom: "10px",
+                            cursor: "pointer",
+                          }}
+                        />
+                        <Typography variant="h4">{friend.username}</Typography>
+                      </Box>
+                      <Dialog
+                        open={deleteDialog}
+                        onClose={handleDeleteDialogClose}
+                      >
+                        <DialogTitle>
+                          <Typography fontSize="20px" fontWeight="bold">
+                            {" "}
+                            CONFIRMATION{" "}
+                          </Typography>
+                          <IconButton
+                            aria-label="close"
+                            onClick={handleDeleteDialogClose}
+                            sx={{
+                              position: "absolute",
+                              right: 8,
+                              top: 8,
+                              color: (theme) => theme.palette.grey[500],
+                            }}
+                          >
+                            <CloseIcon />
+                          </IconButton>
+                        </DialogTitle>
+                        <DialogContent>
+                          <Typography>
+                            {" "}
+                            You are about to remove{" "}
+                            {removeFriend.friendUsername} as friend.
+                          </Typography>
+                          <Typography>
+                            {" "}
+                            This action is irreversible. Are you sure?
+                          </Typography>
+                          <Button
+                            onClick={() =>
+                              handleRemoveFriend(removeFriend.friendId)
+                            }
+                            sx={{
+                              backgroundColor: colors.redAccent[600],
+                              color: colors.grey[100],
+                              fontSize: "15px",
+                              fontWeight: "bold",
+                              padding: "5px",
+                              "&:hover": {
+                                backgroundColor: colors.redAccent[700],
+                              },
+                              width: "100%",
+                              mt: 2,
+                            }}
+                          >
+                            {" "}
+                            REMOVE
+                          </Button>
+                        </DialogContent>
+                      </Dialog>
+                    </Grid>
+                  ))}
+                </Grid>
+              ) : (
+                <Typography variant="h4" align="center">
+                  You currently have no friends
+                </Typography>
+              )}
             </Box>
             <Dialog
               open={friendDialog}

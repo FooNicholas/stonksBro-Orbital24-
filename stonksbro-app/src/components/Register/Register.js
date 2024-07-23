@@ -1,4 +1,4 @@
-import styles from "./Register.css";
+import styles from "./Register.module.css";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import MessageBox from "../MessageBox/MessageBox";
@@ -109,22 +109,20 @@ const Register = () => {
   }, [formData, formData.password, formData.passwordConfirm]);
 
   return (
-    <div className="register-container">
-      <div className="left-side">
-        <img src={stock_image} alt="Stock" className="stock-image" />
+    <div className={styles.registerContainer}>
+      <div className={styles.leftSide}>
+        <img src={stock_image} alt="Stock" className={styles.stockImage} />
       </div>
-      <div className="right-side">
-        <div className="header-icon">
-          <img src={logo_icon} alt="stonksBro" />
-        </div>
-        <div className="container">
-          <div className="header">
-            <div className="text"> Register </div>
-            <div className="underline"></div>
+      <div className={styles.rightSide}>
+        <img className={styles.headerIcon} src={logo_icon} alt="stonksBro" />
+        <div className={styles.container}>
+          <div className={styles.header}>
+            <div className={styles.text}> Register </div>
+            <div className={styles.underline}></div>
           </div>
           <form onSubmit={handleSubmit}>
-            <div className="inputs">
-              <div className="input">
+            <div className={styles.inputs}>
+              <div className={styles.input}>
                 <img src={user_icon} alt="user_icon" />
                 <input
                   type="text"
@@ -135,7 +133,7 @@ const Register = () => {
                 />
               </div>
 
-              <div className="input">
+              <div className={styles.input}>
                 <img src={email_icon} alt="email_icon" />
                 <input
                   type="email"
@@ -145,7 +143,7 @@ const Register = () => {
                   onChange={handleChange}
                 />
               </div>
-              <div className="input">
+              <div className={styles.input}>
                 <img src={password_icon} alt="password_icon" />
                 <input
                   type="password"
@@ -155,7 +153,7 @@ const Register = () => {
                   onChange={handleChange}
                 />
               </div>
-              <div className="input">
+              <div className={styles.input}>
                 <img src={password_icon} alt="password_icon" />
                 <input
                   type="password"
@@ -165,7 +163,7 @@ const Register = () => {
                   onChange={handleChange}
                 />
               </div>
-              <Box sx={{ ml: 8 }}>
+              <Box>
                 <Typography
                   fontSize="12px"
                   sx={{
@@ -209,15 +207,15 @@ const Register = () => {
               </Box>
             </div>
 
-            <div className="submit-container">
-              <button type="submit" className="submit">
+            <div className={styles.submitContainer}>
+              <button type="submit" className={styles.submit}>
                 {" "}
                 Register{" "}
               </button>
             </div>
           </form>
 
-          <div className="login-account">
+          <div className={styles.loginAccount}>
             Already Have an Account?{" "}
             <span onClick={navigateToLogin}>Click Here to Login!</span>
           </div>
