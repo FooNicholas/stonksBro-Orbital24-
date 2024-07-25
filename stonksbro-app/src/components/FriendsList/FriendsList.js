@@ -134,14 +134,14 @@ const Friends = () => {
             </Box>
             <Box m="15px">
               {loading ? (
-                <Box
-                  display="flex"
-                  justifyContent="center"
-                  alignItems="center"
-                  height="600px"
-                  justifySelf="center"
-                >
-                  <CircularProgress />
+                <Box>
+                  <CircularProgress
+                    sx={{
+                      position: "absolute",
+                      top: "50%",
+                      left: "50%",
+                    }}
+                  />
                 </Box>
               ) : friends.length > 0 ? (
                 <Grid container spacing={1}>

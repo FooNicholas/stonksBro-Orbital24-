@@ -19,6 +19,7 @@ import {
   DialogTitle,
   DialogContent,
   IconButton,
+  CircularProgress,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import CloseIcon from "@mui/icons-material/Close";
@@ -37,6 +38,7 @@ const Dashboard = () => {
   const [openDialog, setOpenDialog] = useState(false);
   const [dialogMessage, setDialogMessage] = useState("");
   const [trades, setTrades] = useState([]);
+  const [tradesLoading, setTradesLoading] = useState(true);
 
   useEffect(() => {
     const fetchTickerSymbol = async () => {
@@ -69,9 +71,11 @@ const Dashboard = () => {
           const data = await response.json();
           console.log(data[0].trades);
           setTrades(data[0].trades);
+          setTradesLoading(false);
         }
       } catch (error) {
         console.error("Error fetching ticker symbols:", error);
+        setTradesLoading(false);
       }
     };
 
@@ -283,38 +287,50 @@ const Dashboard = () => {
                       Bought At
                     </Typography>
                   </Box>
-                  {trades
-                    ? trades.map((transaction, i) => (
-                        <Box
-                          display="flex"
-                          justifyContent={"space-between"}
-                          alignItems="center"
-                          borderBottom={`2px solid`}
-                          p="15px"
-                        >
-                          <Box justifyContent={"space-between"} display="flex">
-                            <Box sx={{ width: 150 }}>
-                              <Typography
-                                color={colors.blueAccent[600]}
-                                variant="h5"
-                                fontWeight="600"
-                              >
-                                {transaction.symbol}
-                              </Typography>
-                            </Box>
-                            <Box sx={{ width: 20 }}>{transaction.held}</Box>
+                  {tradesLoading ? (
+                    <Box
+                      display="flex"
+                      justifyContent="center"
+                      alignItems="center"
+                      width="100%"
+                      height="100%"
+                    >
+                      <CircularProgress />
+                    </Box>
+                  ) : trades.length > 0 ? (
+                    trades.map((transaction, i) => (
+                      <Box
+                        display="flex"
+                        justifyContent={"space-between"}
+                        alignItems="center"
+                        borderBottom={`2px solid`}
+                        p="15px"
+                      >
+                        <Box justifyContent={"space-between"} display="flex">
+                          <Box sx={{ width: 150 }}>
+                            <Typography
+                              color={colors.blueAccent[600]}
+                              variant="h5"
+                              fontWeight="600"
+                            >
+                              {transaction.symbol}
+                            </Typography>
                           </Box>
-
-                          <Box
-                            p="5px 10px"
-                            borderRadius="4px"
-                            backgroundColor={colors.blueAccent[600]}
-                          >
-                            ${transaction.boughtAt}
-                          </Box>
+                          <Box sx={{ width: 20 }}>{transaction.held}</Box>
                         </Box>
-                      ))
-                    : "No Recent Transactions"}
+
+                        <Box
+                          p="5px 10px"
+                          borderRadius="4px"
+                          backgroundColor={colors.blueAccent[600]}
+                        >
+                          ${transaction.boughtAt}
+                        </Box>
+                      </Box>
+                    ))
+                  ) : (
+                    "No Recent Transactions"
+                  )}
                 </Box>
               </Box>
             </Box>
