@@ -215,7 +215,8 @@ const AddFriends = () => {
                     display="flex"
                     justifyContent="center"
                     alignItems="center"
-                    height="600px"
+                    width="100%"
+                    height="100%"
                   >
                     <CircularProgress />
                   </Box>
