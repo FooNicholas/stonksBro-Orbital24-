@@ -1,10 +1,22 @@
 import React, { useState, useEffect, useRef, memo } from "react";
-import { Box, TextField, Button, Typography, IconButton, Dialog, DialogActions, DialogContent, DialogTitle, useTheme, Paper } from "@mui/material";
+import {
+  Box,
+  TextField,
+  Button,
+  Typography,
+  IconButton,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  useTheme,
+  Paper,
+} from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import CloseIcon from "@mui/icons-material/Close";
 import { tokens } from "../../theme";
 import { useAuth } from "../AuthContext/AuthContext";
-import { Link } from 'react-router-dom';
+import { Link } from "react-router-dom";
 import AutocompleteWatchlist from "./AutocompleteWatchlist";
 
 function TradingViewDashboard() {
@@ -22,7 +34,8 @@ function TradingViewDashboard() {
     container.current.innerHTML = "";
 
     const script = document.createElement("script");
-    script.src = "https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js";
+    script.src =
+      "https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js";
     script.type = "text/javascript";
     script.async = true;
     script.innerHTML = JSON.stringify({
@@ -49,7 +62,9 @@ function TradingViewDashboard() {
   useEffect(() => {
     const fetchWatchlist = async () => {
       try {
-        const response = await fetch(`https://stonks-bro-orbital24-server.vercel.app/watchlist/${userId}`);
+        const response = await fetch(
+          `https://stonks-bro-orbital24-server.vercel.app/watchlist/${userId}`
+        );
         if (response.ok) {
           const data = await response.json();
           if (Array.isArray(data)) {
@@ -73,16 +88,19 @@ function TradingViewDashboard() {
       setWatchlist([...watchlist, newSymbol.toUpperCase()]);
 
       try {
-        const response = await fetch(`https://stonks-bro-orbital24-server.vercel.app/add-symbol`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            userId: userId,
-            newWatchlist: [...watchlist, newSymbol.toUpperCase()]
-          })
-        });
+        const response = await fetch(
+          `https://stonks-bro-orbital24-server.vercel.app/add-symbol`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              userId: userId,
+              newWatchlist: [...watchlist, newSymbol.toUpperCase()],
+            }),
+          }
+        );
 
         if (response.ok) {
           console.log("Success adding symbol to watchlist");
@@ -95,20 +113,23 @@ function TradingViewDashboard() {
   };
 
   const removeSymbol = async (symbol) => {
-    const updatedWatchlist = watchlist.filter(item => item !== symbol);
+    const updatedWatchlist = watchlist.filter((item) => item !== symbol);
     setWatchlist(updatedWatchlist);
 
     try {
-      const response = await fetch(`https://stonks-bro-orbital24-server.vercel.app/remove-symbol`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          userId: userId,
-          newWatchlist: updatedWatchlist
-        })
-      });
+      const response = await fetch(
+        `https://stonks-bro-orbital24-server.vercel.app/remove-symbol`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            userId: userId,
+            newWatchlist: updatedWatchlist,
+          }),
+        }
+      );
 
       if (response.ok) {
         console.log("Success removing symbol in watchlist");
@@ -148,24 +169,10 @@ function TradingViewDashboard() {
       </Button>
 
       <Dialog open={isDialogOpen} onClose={handleDialogClose}>
-        <DialogTitle>
-          Edit Watchlist
-          <IconButton
-            aria-label="close"
-            onClick={handleDialogClose}
-            sx={{
-              position: "absolute",
-              right: 8,
-              top: 8,
-              color: (theme) => theme.palette.grey[500],
-            }}
-          >
-            <CloseIcon />
-          </IconButton>
-        </DialogTitle>
+        <DialogTitle>Edit Watchlist</DialogTitle>
         <DialogContent>
           <Box sx={{ mt: 1, mb: 2, display: "flex", alignItems: "center" }}>
-            <AutocompleteWatchlist setNewSymbol={setNewSymbol}/>
+            <AutocompleteWatchlist setNewSymbol={setNewSymbol} />
             <Button
               variant="contained"
               color="primary"
@@ -175,7 +182,7 @@ function TradingViewDashboard() {
                 color: colors.grey[100],
                 fontWeight: "bold",
                 "&:hover": {
-                backgroundColor: colors.blueAccent[700],
+                  backgroundColor: colors.blueAccent[700],
                 },
                 ml: 1,
               }}
@@ -185,11 +192,18 @@ function TradingViewDashboard() {
           </Box>
           <Box>
             {watchlist.map((symbol, index) => (
-              <Paper key={index} sx={{ display: "flex", alignItems: "center", mb: 1, p: 2 }}>
+              <Paper
+                key={index}
+                sx={{ display: "flex", alignItems: "center", mb: 1, p: 2 }}
+              >
                 <Typography variant="body1" sx={{ flexGrow: 1 }}>
                   {symbol}
                 </Typography>
-                <IconButton color="secondary" onClick={() => removeSymbol(symbol)}>
+                <IconButton
+                  color="secondary"
+                  onClick={() => removeSymbol(symbol)}
+                  aria-label={`delete ${symbol}`}
+                >
                   <DeleteIcon />
                 </IconButton>
               </Paper>
@@ -197,7 +211,11 @@ function TradingViewDashboard() {
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleDialogClose} color="primary" startIcon={<CloseIcon />}>
+          <Button
+            onClick={handleDialogClose}
+            color="primary"
+            startIcon={<CloseIcon />}
+          >
             Close
           </Button>
         </DialogActions>

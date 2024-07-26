@@ -2,11 +2,11 @@ import React from "react";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import { MemoryRouter } from "react-router-dom";
-import Register from "../Register/Register";
-import MessageBox from "../MessageBox/MessageBox";
+import Register from "../components/Register/Register";
+import MessageBox from "../components/MessageBox/MessageBox";
 
 // Mock MessageBox component
-jest.mock("../MessageBox/MessageBox", () => ({
+jest.mock("../components/MessageBox/MessageBox", () => ({
   __esModule: true,
   default: ({ message, onClose }) => (
     <div data-testid="message-box">

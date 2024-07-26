@@ -163,6 +163,7 @@ const Friends = () => {
                         }}
                       >
                         <IconButton
+                          aria-label={`remove friend`}
                           onClick={() =>
                             handleDeleteDialogOpen(friend.username, friend.id)
                           }
@@ -203,7 +204,7 @@ const Friends = () => {
                             CONFIRMATION{" "}
                           </Typography>
                           <IconButton
-                            aria-label="close"
+                            aria-label="close confirmation"
                             onClick={handleDeleteDialogClose}
                             sx={{
                               position: "absolute",
@@ -226,6 +227,7 @@ const Friends = () => {
                             This action is irreversible. Are you sure?
                           </Typography>
                           <Button
+                            aria-label="confirm remove"
                             onClick={() =>
                               handleRemoveFriend(removeFriend.friendId)
                             }
@@ -242,7 +244,6 @@ const Friends = () => {
                               mt: 2,
                             }}
                           >
-                            {" "}
                             REMOVE
                           </Button>
                         </DialogContent>
@@ -274,7 +275,7 @@ const Friends = () => {
                   FRIEND PROFILE
                 </Typography>
                 <IconButton
-                  aria-label="close"
+                  aria-label="close profile"
                   onClick={handleFriendProfileClose}
                   sx={{
                     position: "absolute",
@@ -405,7 +406,7 @@ const Friends = () => {
                         );
                       })
                     ) : (
-                      <Typography>No portfolio available</Typography>
+                      <Typography>No portfolio available.</Typography>
                     )}
                   </Box>
                 </Box>

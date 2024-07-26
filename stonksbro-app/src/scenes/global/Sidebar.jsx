@@ -1,16 +1,16 @@
 import { useState, useEffect } from "react";
 import { Sidebar, Menu, MenuItem } from "react-pro-sidebar";
-import { 
-  Box, 
-  Icon, 
-  IconButton, 
-  Typography, 
-  useTheme, 
+import {
+  Box,
+  Icon,
+  IconButton,
+  Typography,
+  useTheme,
   Dialog,
   DialogActions,
   DialogContent,
-  DialogTitle, 
-  Avatar, 
+  DialogTitle,
+  Avatar,
   Button,
 } from "@mui/material";
 
@@ -21,7 +21,7 @@ import { useAuth } from "../../components/AuthContext/AuthContext";
 import ContactsOutlinedIcon from "@mui/icons-material/ContactsOutlined";
 import ReceiptOutlinedIcon from "@mui/icons-material/ReceiptOutlined";
 import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
-import PersonAddAltOutlinedIcon from '@mui/icons-material/PersonAddAltOutlined';
+import PersonAddAltOutlinedIcon from "@mui/icons-material/PersonAddAltOutlined";
 import CalendarTodayOutlinedIcon from "@mui/icons-material/CalendarTodayOutlined";
 import BarChartOutlinedIcon from "@mui/icons-material/BarChartOutlined";
 import PieChartOutlineOutlinedIcon from "@mui/icons-material/PieChartOutlineOutlined";
@@ -106,7 +106,7 @@ const Navbar = () => {
   const handleChangeAvatarClose = () => {
     setSelectedIcon("");
     setIconPromptVisible(false);
-  }
+  };
 
   const handleChangeAvatar = async () => {
     setIconPromptVisible(false);
@@ -161,9 +161,12 @@ const Navbar = () => {
       <Sidebar collapsed={isCollapsed}>
         <Menu iconShape="square">
           {/* LOGO AND MENU ICON */}
+
           <MenuItem
             onClick={() => setIsCollapsed(!isCollapsed)}
-            icon={isCollapsed ? <MenuOutlinedIcon /> : undefined}
+            icon={
+              isCollapsed ? <MenuOutlinedIcon aria-label="menu" /> : undefined
+            }
             style={{
               margin: "10px 0 20px 0",
               color: colors.grey[100],
@@ -179,13 +182,15 @@ const Navbar = () => {
                 <Typography variant="h7" color={colors.grey[100]}>
                   stonksBro
                 </Typography>
-                <IconButton onClick={() => setIsCollapsed(!isCollapsed)}>
+                <IconButton
+                  onClick={() => setIsCollapsed(!isCollapsed)}
+                  aria-label="menu"
+                >
                   <MenuOutlinedIcon />
                 </IconButton>
               </Box>
             )}
           </MenuItem>
-
           {!isCollapsed && (
             <Box mb="25px">
               <Box display="flex" justifyContent="center" alignItems="center">
@@ -199,7 +204,7 @@ const Navbar = () => {
                     cursor: "pointer",
                   }}
                 />
-                
+
                 {/* <img
                   alt="profile-user"
                   width="100px"
@@ -230,7 +235,8 @@ const Navbar = () => {
                         key={index}
                         sx={{
                           m: 1,
-                          border: selectedIcon === icon
+                          border:
+                            selectedIcon === icon
                               ? `2px solid ${colors.blueAccent[600]}`
                               : "none",
                           borderRadius: "50%",
@@ -261,7 +267,6 @@ const Navbar = () => {
               </Dialog>
             </Box>
           )}
-
           <Box paddingLeft={isCollapsed ? undefined : "10%"}>
             <Item
               title="Dashboard"
@@ -360,7 +365,6 @@ const Navbar = () => {
           </Box>
         </Menu>
       </Sidebar>
-      
     </Box>
   );
 };

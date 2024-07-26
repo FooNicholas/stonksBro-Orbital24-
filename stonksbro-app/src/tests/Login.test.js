@@ -2,11 +2,11 @@ import React from "react";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react"; // Import waitFor
 import "@testing-library/jest-dom";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
-import Login from "./Login";
-import { useAuth } from "../AuthContext/AuthContext";
+import Login from "../components/Login/Login";
+import { useAuth } from "../components/AuthContext/AuthContext";
 
 // Mock useAuth
-jest.mock("../AuthContext/AuthContext", () => ({
+jest.mock("../components/AuthContext/AuthContext", () => ({
   useAuth: jest.fn(),
 }));
 
@@ -123,5 +123,35 @@ describe("Login Component", () => {
     fireEvent.click(resetLink);
 
     expect(screen.getByText(/reset password/i)).toBeInTheDocument();
+  });
+
+  test("shows error message when email or password is invalid", async () => {
+    global.fetch.mockImplementationOnce(() =>
+      Promise.resolve({
+        ok: false,
+        text: () => Promise.resolve("Invalid email or password"),
+      })
+    );
+
+    render(
+      <MemoryRouter>
+        <Login />
+      </MemoryRouter>
+    );
+
+    fireEvent.change(screen.getByPlaceholderText(/email/i), {
+      target: { value: "invalid@example.com" },
+    });
+    fireEvent.change(screen.getByPlaceholderText(/password/i), {
+      target: { value: "wrongpassword" },
+    });
+
+    fireEvent.click(screen.getByRole("button", { name: /login/i }));
+
+    await waitFor(() => {
+      expect(
+        screen.getByText(/invalid email or password/i)
+      ).toBeInTheDocument();
+    });
   });
 });
