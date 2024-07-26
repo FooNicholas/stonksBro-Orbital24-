@@ -23,6 +23,7 @@ import {
   FormControl,
   InputAdornment,
   CircularProgress,
+  formControlClasses,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import CloseIcon from "@mui/icons-material/Close";
@@ -281,7 +282,7 @@ const Portfolio = () => {
           setAddBalance(0);
           setErrorMessage("");
           setTotalValueLoading(false);
-        setAccountBalanceLoading(false);
+          setAccountBalanceLoading(false);
           console.log("Successfully added to available balance");
         }
       } catch (error) {
@@ -334,8 +335,34 @@ const Portfolio = () => {
       );
       setPortfolio(updatedPortfolio);
       calculateTotalCurrentValue(updatedPortfolio);
+      updateCurrentPricesInDatabase(updatedPortfolio);
     } catch (error) {
       console.error("Error fetching real-time prices", error);
+    }
+  };
+
+  const updateCurrentPricesInDatabase = async (portfolio) => {
+    try {
+      const response = await fetch(
+        `https://stonks-bro-orbital24-server.vercel.app/portfolio/${userId}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            portfolio: portfolio,
+          }),
+        }
+      );
+
+      if (response.ok) {
+        console.log("Successfully updated current prices in database");
+      } else {
+        console.log("Unable to update current prices in database");
+      }
+    } catch (error) {
+      console.error("Error updating current prices in database", error);
     }
   };
 
@@ -354,8 +381,7 @@ const Portfolio = () => {
         setPortfolioLoading(true);
         setAccountBalanceLoading(true);
         setTotalValueLoading(true);
-        await getPortfolio();
-        await fetchRealTimePrices();
+        getPortfolio();
         setPortfolioLoading(false);
         setAccountBalanceLoading(false);
       };

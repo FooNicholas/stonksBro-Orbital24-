@@ -75,6 +75,7 @@ const Friends = () => {
 
   const handleRemoveFriend = async (friendId) => {
     handleDeleteDialogClose();
+    setLoading(true);
     try {
       const response = await fetch(
         `https://stonks-bro-orbital24-server.vercel.app/remove-friend`,
@@ -95,9 +96,11 @@ const Friends = () => {
         console.log("Successfully removed friend from friends list");
       } else {
         console.log("Failed to remove friend from friends list");
+        setLoading(false);
       }
     } catch (error) {
       console.error("Error removing friend:", error);
+      setLoading(false);
     }
   };
 
