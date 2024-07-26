@@ -33,6 +33,7 @@ const AddFriends = () => {
   const [message, setMessage] = useState("");
   const [friendRequests, setFriendRequests] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [loadSendRequest, setLoadSendRequest] = useState(false);
   const { userId, username } = useAuth();
 
   useEffect(() => {
@@ -64,6 +65,7 @@ const AddFriends = () => {
 
   const handleAccept = async (e, senderId) => {
     e.preventDefault();
+    setLoading(true);
     try {
       const response = await fetch(
         `https://stonks-bro-orbital24-server.vercel.app/accept`,
@@ -83,16 +85,20 @@ const AddFriends = () => {
         setFriendRequests((prevRequests) =>
           prevRequests.filter((request) => request.sender_id !== senderId)
         );
+        setLoading(false);
       } else {
         console.error("Failed to accept friend request");
+        setLoading(false);
       }
     } catch (error) {
       console.error("Error accepting friend requests:", error);
+      setLoading(false);
     }
   };
 
   const handleReject = async (e, senderId) => {
     e.preventDefault();
+    setLoading(true);
     try {
       const response = await fetch(
         `https://stonks-bro-orbital24-server.vercel.app/reject`,
@@ -113,19 +119,24 @@ const AddFriends = () => {
         setFriendRequests((prevRequests) =>
           prevRequests.filter((request) => request.sender_id !== senderId)
         );
+        setLoading(false);
       } else {
         console.error("Failed to reject friend request");
+        setLoading(false);
       }
     } catch (error) {
       console.error("Error rejecting friend requests:", error);
+      setLoading(false);
     }
   };
 
   const handleSendFriendRequest = async (e) => {
     e.preventDefault();
+    setLoadSendRequest(true);
 
     if (searchQuery === username) {
       setMessage("You cannot send a friend request to yourself");
+      setLoadSendRequest(false);
     } else {
       try {
         const response = await fetch(
@@ -146,15 +157,18 @@ const AddFriends = () => {
           const responseMessage = await response.text();
           setMessage(responseMessage);
           setSearchQuery("");
+          setLoadSendRequest(false);
         } else {
           const errorMessage = await response.text();
           setMessage(errorMessage);
           setSearchQuery("");
+          setLoadSendRequest(false);
         }
       } catch (error) {
         console.error("Error sending friend request:", error);
         setMessage("Error sending friend request.");
         setSearchQuery("");
+        setLoadSendRequest(false);
       }
     }
   };
@@ -289,8 +303,21 @@ const AddFriends = () => {
                     No Incoming Friend requests
                   </Typography>
                 )}
+                {loadSendRequest ? (
+                  <Box
+                    display="flex"
+                    justifyContent="center"
+                    alignItems="center"
+                    width="100%"
+                    height="40%"
+                  >
+                    <CircularProgress />
+                  </Box>
+                ) : (
+                  <Box></Box>
+                )}
+                <MessageBox message={message} onClose={() => setMessage("")} />
               </Box>
-              <MessageBox message={message} onClose={() => setMessage("")} />
             </Box>
           </main>
         </div>
