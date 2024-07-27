@@ -124,12 +124,8 @@ const Register = () => {
             <div className={styles.inputs}>
               <div className={styles.input}>
                 <img src={user_icon} alt="user_icon" />
-                <label htmlFor="username" className={styles.visuallyHidden}>
-                  Username
-                </label>
                 <input
                   type="text"
-                  id="username"
                   placeholder="Username"
                   name="username"
                   value={formData.username}
@@ -139,12 +135,8 @@ const Register = () => {
 
               <div className={styles.input}>
                 <img src={email_icon} alt="email_icon" />
-                <label htmlFor="email" className={styles.visuallyHidden}>
-                  Email
-                </label>
                 <input
                   type="email"
-                  id="email"
                   placeholder="Email"
                   name="email"
                   value={formData.email}
@@ -153,12 +145,8 @@ const Register = () => {
               </div>
               <div className={styles.input}>
                 <img src={password_icon} alt="password_icon" />
-                <label htmlFor="password" className={styles.visuallyHidden}>
-                  Password
-                </label>
                 <input
                   type="password"
-                  id="password"
                   placeholder="Password"
                   name="password"
                   value={formData.password}
@@ -167,15 +155,8 @@ const Register = () => {
               </div>
               <div className={styles.input}>
                 <img src={password_icon} alt="password_icon" />
-                <label
-                  htmlFor="passwordConfirm"
-                  className={styles.visuallyHidden}
-                >
-                  Confirm Password
-                </label>
                 <input
                   type="password"
-                  id="passwordConfirm"
                   placeholder="Confirm Password"
                   name="passwordConfirm"
                   value={formData.passwordConfirm}

@@ -23,6 +23,7 @@ import {
   FormControl,
   InputAdornment,
   CircularProgress,
+  formControlClasses,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import CloseIcon from "@mui/icons-material/Close";
@@ -38,7 +39,7 @@ const Portfolio = () => {
   const [portfolio, setPortfolio] = useState([]);
   const [totalCurrentValue, setTotalCurrentValue] = useState(0);
   const [accountBalance, setAccountBalance] = useState(0);
-  
+
   const [portfolioLoading, setPortfolioLoading] = useState(true);
   const [accountBalanceLoading, setAccountBalanceLoading] = useState(true);
   const [totalValueLoading, setTotalValueLoading] = useState(true);
@@ -48,7 +49,8 @@ const Portfolio = () => {
   const [errorMessage, setErrorMessage] = useState("");
   const [isErrorDialogOpen, setErrorDialogOpen] = useState(false);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
-  const [isConfirmSellDialogOpen, setIsConfirmSellDialogOpen] = useState(false);
+  const [isSellAmountDialogOpen, setSellAmountDialogOpen] = useState(false);
+  const [sellAmountError, setSellAmountError] = useState("");
 
   const totalAccountValue = (
     parseFloat(totalCurrentValue) + parseFloat(accountBalance)
@@ -106,6 +108,8 @@ const Portfolio = () => {
 
   const handleBuyOrder = async () => {
     try {
+      setAccountBalanceLoading(true);
+      setTotalValueLoading(true);
       const response = await fetch(
         `https://stonks-bro-orbital24-server.vercel.app/api/buy/${buyData.symbol}`,
         {
@@ -125,42 +129,72 @@ const Portfolio = () => {
         const data = await response.json();
         getPortfolio();
         console.log("Successfully ordered!");
+        setTotalValueLoading(false);
+        setAccountBalanceLoading(false);
       } else {
         const data = await response.json();
         setErrorDialogOpen(true);
         setErrorMessage(data);
+        setTotalValueLoading(false);
+        setAccountBalanceLoading(false);
         console.error("Error handling buy order:", data.error);
       }
     } catch (error) {
+      setTotalValueLoading(false);
+      setAccountBalanceLoading(false);
       console.error("Error handling buy order", error);
     }
   };
-
-  const [sellAmount, setSellAmount] = useState(0);
 
   const [sellData, setSellData] = useState({
     index: "",
     symbol: "", //text
     quantity: "", //integer
     currentValue: "", //integer
+    held: "", //integer
   });
 
-  const handleSellDialogOpen = (index, symbol, held, currentValue) => {
-    setSellData({
-      index: index,
-      symbol: symbol,
-      quantity: held,
-      currentValue: currentValue,
-    });
+  const handleSellDialogOpen = () => {
     setIsSellDialogOpen(true);
   };
 
   const handleSellDialogClose = () => {
-    setSellData({ symbol: "", quantity: "", currentValue: "" });
     setIsSellDialogOpen(false);
+    setSellData({ symbol: "", quantity: "", currentValue: "", held: "" });
+  };
+
+  const handleSellAmountOpen = (index, symbol, held, currentValue) => {
+    setSellData({
+      index: index,
+      symbol: symbol,
+      held: held,
+      currentValue: currentValue,
+    });
+    setSellAmountDialogOpen(true);
+  };
+
+  const handleSellAmountClose = () => {
+    setSellAmountDialogOpen(false);
+    setSellAmountError("");
+    setSellData({ symbol: "", quantity: "", currentValue: "", held: "" });
+  };
+
+  const handleSellAmountConfirm = () => {
+    console.log(sellData);
+    if (!sellData.quantity || sellData.quantity <= 0) {
+      setSellAmountError("Please enter a valid number");
+    } else if (sellData.quantity > sellData.held) {
+      setSellAmountError("You do not have enough stocks to conduct this trade");
+    } else {
+      setSellAmountDialogOpen(false);
+      setSellAmountError("");
+      handleSellDialogOpen();
+    }
   };
 
   const handleSellOrder = async () => {
+    setPortfolioLoading(true);
+    setAccountBalanceLoading(true);
     try {
       const updatedPortfolio = portfolio
         .map((stock, index) => {
@@ -197,10 +231,16 @@ const Portfolio = () => {
         getPortfolio();
         console.log("Successfully processed sell order");
         handleSellDialogClose();
+        setTotalValueLoading(false);
+        setAccountBalanceLoading(false);
       } else {
         console.error("Failed to process sell order");
+        setTotalValueLoading(false);
+        setAccountBalanceLoading(false);
       }
     } catch (error) {
+      setTotalValueLoading(false);
+      setAccountBalanceLoading(false);
       console.error("Error processing sell order", error);
     }
   };
@@ -219,6 +259,8 @@ const Portfolio = () => {
 
   const handleAddBalance = async () => {
     if (addBalance > 0) {
+      setAccountBalanceLoading(true);
+      setTotalValueLoading(true);
       try {
         const response = await fetch(
           `https://stonks-bro-orbital24-server.vercel.app/add-balance`,
@@ -237,6 +279,10 @@ const Portfolio = () => {
         if (response.ok) {
           getPortfolio();
           setIsAddDialogOpen(false);
+          setAddBalance(0);
+          setErrorMessage("");
+          setTotalValueLoading(false);
+          setAccountBalanceLoading(false);
           console.log("Successfully added to available balance");
         }
       } catch (error) {
@@ -290,8 +336,34 @@ const Portfolio = () => {
       );
       setPortfolio(updatedPortfolio);
       calculateTotalCurrentValue(updatedPortfolio);
+      updateCurrentPricesInDatabase(updatedPortfolio);
     } catch (error) {
       console.error("Error fetching real-time prices", error);
+    }
+  };
+
+  const updateCurrentPricesInDatabase = async (portfolio) => {
+    try {
+      const response = await fetch(
+        `https://stonks-bro-orbital24-server.vercel.app/portfolio/${userId}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            portfolio: portfolio,
+          }),
+        }
+      );
+
+      if (response.ok) {
+        console.log("Successfully updated current prices in database");
+      } else {
+        console.log("Unable to update current prices in database");
+      }
+    } catch (error) {
+      console.error("Error updating current prices in database", error);
     }
   };
 
@@ -301,16 +373,26 @@ const Portfolio = () => {
       0
     );
     setTotalCurrentValue(total.toFixed(2));
+    setTotalValueLoading(false);
   };
 
   useEffect(() => {
-    getPortfolio();
-    const interval = setInterval(() => {
-      fetchRealTimePrices(portfolio);
-    }, 300000); // Fetch real time stock price every 5 minutes
+    if (userId) {
+      const fetchPortfolioData = async () => {
+        setPortfolioLoading(true);
+        setAccountBalanceLoading(true);
+        setTotalValueLoading(true);
+        getPortfolio();
+        setPortfolioLoading(false);
+        setAccountBalanceLoading(false);
+      };
 
-    return () => clearInterval(interval);
-  }, [userId, setTotalCurrentValue]);
+      fetchPortfolioData();
+      const interval = setInterval(fetchPortfolioData, 300000);
+
+      return () => clearInterval(interval);
+    }
+  }, [userId]);
 
   return (
     <>
@@ -323,10 +405,20 @@ const Portfolio = () => {
         <Box sx={{ display: "flex", alignItems: "center" }}>
           <Box>
             <Typography variant="h3">
-              Account Value: ${totalAccountValue}
+              Total Account Value:{" "}
+              {totalValueLoading || accountBalanceLoading ? (
+                <CircularProgress />
+              ) : (
+                parseFloat(totalAccountValue).toFixed(2)
+              )}
             </Typography>
             <Typography variant="h3" marginTop="15px">
-              Available Balance: ${parseFloat(accountBalance).toFixed(2)}
+              Account Balance:{" "}
+              {accountBalanceLoading ? (
+                <CircularProgress />
+              ) : (
+                parseFloat(accountBalance).toFixed(2)
+              )}
             </Typography>
           </Box>
           <Box /* Profit / Loss of total account value*/
@@ -760,7 +852,7 @@ const Portfolio = () => {
                   <TableCell>
                     <Button
                       onClick={() =>
-                        handleSellDialogOpen(
+                        handleSellAmountOpen(
                           index,
                           data.symbol,
                           parseFloat(data.held),
@@ -786,8 +878,7 @@ const Portfolio = () => {
                     >
                       <DialogTitle>
                         <Typography fontSize="20px" fontWeight="bold">
-                          {" "}
-                          SELL{" "}
+                          CONFIRMATION
                         </Typography>
                         <IconButton
                           aria-label="close"
@@ -832,9 +923,84 @@ const Portfolio = () => {
                               }}
                             >
                               {" "}
-                              Sell
+                              Confirm Sell
                             </Button>
                           </Box>
+                        </Box>
+                      </DialogContent>
+                    </Dialog>
+                    <Dialog
+                      open={isSellAmountDialogOpen}
+                      onClose={handleSellAmountClose}
+                    >
+                      {" "}
+                      <DialogTitle>
+                        <Typography fontSize="20px" fontWeight="bold">
+                          {" "}
+                          SELL{" "}
+                        </Typography>
+                        <IconButton
+                          aria-label="close"
+                          onClick={handleSellAmountClose}
+                          sx={{
+                            position: "absolute",
+                            right: 8,
+                            top: 8,
+                            color: (theme) => theme.palette.grey[500],
+                          }}
+                        >
+                          <CloseIcon />
+                        </IconButton>
+                      </DialogTitle>
+                      <DialogContent>
+                        <Box sx={{ width: 300 }}>
+                          <Typography>
+                            {" "}
+                            Please enter how many {sellData.symbol} stocks you
+                            want to sell @ ${sellData.currentValue}.
+                          </Typography>
+                          <Typography>
+                            You currently hold {sellData.held} {sellData.symbol}{" "}
+                            stocks.
+                          </Typography>
+                          <TextField
+                            label="Amount"
+                            type="number"
+                            value={setSellData.quantity}
+                            onChange={(e) =>
+                              setSellData({
+                                ...sellData,
+                                quantity: e.target.value,
+                              })
+                            }
+                            variant="outlined"
+                            sx={{ width: "100%", mt: 1 }}
+                          />
+                          {sellAmountError && (
+                            <Typography
+                              sx={{ color: colors.redAccent[500], mt: 1 }}
+                            >
+                              {sellAmountError}
+                            </Typography>
+                          )}
+                          <Button
+                            onClick={handleSellAmountConfirm}
+                            sx={{
+                              backgroundColor: colors.blueAccent[600],
+                              color: colors.grey[100],
+                              fontSize: "15px",
+                              fontWeight: "bold",
+                              padding: "5px",
+                              "&:hover": {
+                                backgroundColor: colors.blueAccent[700],
+                              },
+                              width: "100%",
+                              mt: 2,
+                            }}
+                          >
+                            {" "}
+                            Sell
+                          </Button>
                         </Box>
                       </DialogContent>
                     </Dialog>

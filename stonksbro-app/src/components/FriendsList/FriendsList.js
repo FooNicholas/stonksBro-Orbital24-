@@ -75,6 +75,7 @@ const Friends = () => {
 
   const handleRemoveFriend = async (friendId) => {
     handleDeleteDialogClose();
+    setLoading(true);
     try {
       const response = await fetch(
         `https://stonks-bro-orbital24-server.vercel.app/remove-friend`,
@@ -95,9 +96,11 @@ const Friends = () => {
         console.log("Successfully removed friend from friends list");
       } else {
         console.log("Failed to remove friend from friends list");
+        setLoading(false);
       }
     } catch (error) {
       console.error("Error removing friend:", error);
+      setLoading(false);
     }
   };
 
@@ -134,14 +137,14 @@ const Friends = () => {
             </Box>
             <Box m="15px">
               {loading ? (
-                <Box
-                  display="flex"
-                  justifyContent="center"
-                  alignItems="center"
-                  height="600px"
-                  justifySelf="center"
-                >
-                  <CircularProgress />
+                <Box>
+                  <CircularProgress
+                    sx={{
+                      position: "absolute",
+                      top: "50%",
+                      left: "50%",
+                    }}
+                  />
                 </Box>
               ) : friends.length > 0 ? (
                 <Grid container spacing={1}>
@@ -163,7 +166,6 @@ const Friends = () => {
                         }}
                       >
                         <IconButton
-                          aria-label={`remove friend`}
                           onClick={() =>
                             handleDeleteDialogOpen(friend.username, friend.id)
                           }
@@ -204,7 +206,7 @@ const Friends = () => {
                             CONFIRMATION{" "}
                           </Typography>
                           <IconButton
-                            aria-label="close confirmation"
+                            aria-label="close"
                             onClick={handleDeleteDialogClose}
                             sx={{
                               position: "absolute",
@@ -227,7 +229,6 @@ const Friends = () => {
                             This action is irreversible. Are you sure?
                           </Typography>
                           <Button
-                            aria-label="confirm remove"
                             onClick={() =>
                               handleRemoveFriend(removeFriend.friendId)
                             }
@@ -244,6 +245,7 @@ const Friends = () => {
                               mt: 2,
                             }}
                           >
+                            {" "}
                             REMOVE
                           </Button>
                         </DialogContent>

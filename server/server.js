@@ -751,6 +751,28 @@ app.get("/portfolio/:userId", async (req, res) => {
   }
 });
 
+app.post("/portfolio/:userId", async (req, res) => {
+  const { userId } = req.params;
+  const { portfolio } = req.body;
+
+  try {
+    const { error } = await supabase
+    .from("users")
+    .update({trades: portfolio})
+    .eq("id", userId)
+
+    if (error) {
+      console.error("Supabase error:", fetchPortfolioError.message);
+      return res.status(500).send("Internal server error.");
+    }
+
+    res.status(200).send("Successfully updated portfolio");
+  } catch (error) {
+    console.error("Server error:", error);
+    res.status(500).send("Internal server error.");
+  }
+});
+
 app.post("/sell/:userId", async (req, res) => {
   const { userId } = req.params;
   const { updatedPortfolio, newAccountBalance } = req.body;

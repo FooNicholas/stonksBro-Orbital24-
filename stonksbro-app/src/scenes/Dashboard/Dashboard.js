@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { tokens, ColorModeContext, useMode } from "../../theme";
-import { mockTransactions } from "../../data/mockData";
 import { useAuth } from "../../components/AuthContext/AuthContext";
 import Header from "../../components/Header/Header";
 import Topbar from "../global/Topbar";
@@ -19,8 +18,8 @@ import {
   Dialog,
   DialogTitle,
   DialogContent,
-  DialogActions,
   IconButton,
+  CircularProgress,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import CloseIcon from "@mui/icons-material/Close";
@@ -38,6 +37,8 @@ const Dashboard = () => {
 
   const [openDialog, setOpenDialog] = useState(false);
   const [dialogMessage, setDialogMessage] = useState("");
+  const [trades, setTrades] = useState([]);
+  const [tradesLoading, setTradesLoading] = useState(true);
 
   useEffect(() => {
     const fetchTickerSymbol = async () => {
@@ -61,7 +62,25 @@ const Dashboard = () => {
       }
     };
 
+    const fetchRecentTrades = async () => {
+      try {
+        const response = await fetch(
+          `https://stonks-bro-orbital24-server.vercel.app/portfolio/${userId}`
+        );
+        if (response.ok) {
+          const data = await response.json();
+          console.log(data[0].trades);
+          setTrades(data[0].trades);
+          setTradesLoading(false);
+        }
+      } catch (error) {
+        console.error("Error fetching ticker symbols:", error);
+        setTradesLoading(false);
+      }
+    };
+
     fetchTickerSymbol();
+    fetchRecentTrades();
   }, [userId]);
 
   const handleSymbolChange = (e, index) => {
@@ -223,48 +242,95 @@ const Dashboard = () => {
                     display="flex"
                     justifyContent="space-between"
                     alignItems="center"
-                    borderBottom={`3px solid`}
                     colors={colors.grey[100]}
-                    p="15px"
+                    ml="15px"
+                    mt="15px"
+                    mb="1px"
                   >
                     <Typography
                       color={colors.blueAccent[600]}
+                      variant="h3"
+                      fontWeight="600"
+                    >
+                      Portfolio
+                    </Typography>
+                  </Box>
+                  <Box
+                    display="flex"
+                    justifyContent={"space-between"}
+                    borderBottom={`3px solid`}
+                  >
+                    <Box
+                      display="flex"
+                      justifyContent={"space-between"}
+                      alignItems="center"
+                    >
+                      <Typography
+                        sx={{ width: 145, ml: 2 }}
+                        variant="h5"
+                        fontWeight="600"
+                      >
+                        {" "}
+                        Symbol{" "}
+                      </Typography>
+                      <Typography variant="h5" fontWeight="600">
+                        {" "}
+                        Quantity{" "}
+                      </Typography>
+                    </Box>{" "}
+                    <Typography
+                      sx={{ mr: "15px" }}
                       variant="h5"
                       fontWeight="600"
                     >
-                      Recent Transactions
+                      {" "}
+                      Bought At
                     </Typography>
                   </Box>
-                  {mockTransactions.map((transaction, i) => (
+                  {tradesLoading ? (
                     <Box
-                      key={`${transaction.txId}-${i}`}
                       display="flex"
-                      justifyContent="space-between"
+                      justifyContent="center"
                       alignItems="center"
-                      borderBottom={`2px solid`}
-                      p="15px"
+                      width="100%"
+                      height="100%"
                     >
-                      <Box>
-                        <Typography
-                          color={colors.blueAccent[600]}
-                          variant="h5"
-                          fontWeight="600"
-                        >
-                          {transaction.txId}
-                        </Typography>
-
-                        {transaction.user}
-                      </Box>
-                      <Box>{transaction.date}</Box>
-                      <Box
-                        p="5px 10px"
-                        borderRadius="4px"
-                        backgroundColor={colors.blueAccent[600]}
-                      >
-                        ${transaction.cost}
-                      </Box>
+                      <CircularProgress />
                     </Box>
-                  ))}
+                  ) : trades.length > 0 ? (
+                    trades.map((transaction, i) => (
+                      <Box
+                        display="flex"
+                        justifyContent={"space-between"}
+                        alignItems="center"
+                        borderBottom={`2px solid`}
+                        p="15px"
+                      >
+                        <Box justifyContent={"space-between"} display="flex">
+                          <Box sx={{ width: 150 }}>
+                            <Typography
+                              color={colors.blueAccent[600]}
+                              variant="h5"
+                              fontWeight="600"
+                            >
+                              {transaction.symbol}
+                            </Typography>
+                          </Box>
+                          <Box sx={{ width: 20 }}>{transaction.held}</Box>
+                        </Box>
+
+                        <Box
+                          p="5px 10px"
+                          borderRadius="4px"
+                          backgroundColor={colors.blueAccent[600]}
+                        >
+                          ${transaction.boughtAt}
+                        </Box>
+                      </Box>
+                    ))
+                  ) : (
+                    "No Recent Transactions"
+                  )}
                 </Box>
               </Box>
             </Box>
