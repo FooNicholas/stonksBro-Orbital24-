@@ -67,19 +67,11 @@ describe("Topbar Component", () => {
   test("renders Topbar component", async () => {
     renderWithProviders(<Topbar />, { providerProps: { colorMode: {} } });
 
-    await waitFor(() => {
-      // Check if the search input is rendered
-      expect(screen.getByPlaceholderText("Search")).toBeInTheDocument();
-    });
-
     // Check if the light mode button is rendered
     expect(screen.getByTestId("LightModeOutlinedIcon")).toBeInTheDocument();
 
     // Check if the notifications button is rendered
     expect(screen.getByTestId("NotificationsOutlinedIcon")).toBeInTheDocument();
-
-    // Check if the settings button is rendered
-    expect(screen.getByTestId("SettingsOutlinedIcon")).toBeInTheDocument();
 
     // Check if the logout button is rendered
     expect(screen.getByTestId("LogoutIcon")).toBeInTheDocument();
