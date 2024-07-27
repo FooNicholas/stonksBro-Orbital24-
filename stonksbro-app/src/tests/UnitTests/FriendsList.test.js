@@ -7,14 +7,14 @@ import {
   within,
 } from "@testing-library/react";
 import "@testing-library/jest-dom";
-import Friends from "../components/FriendsList/FriendsList";
+import Friends from "../../components/FriendsList/FriendsList";
 import { MemoryRouter } from "react-router-dom";
-import { useAuth } from "../components/AuthContext/AuthContext";
+import { useAuth } from "../../components/AuthContext/AuthContext";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
-import { ColorModeContext } from "../theme";
+import { ColorModeContext } from "../../theme";
 
 // Mock useAuth
-jest.mock("../components/AuthContext/AuthContext", () => ({
+jest.mock("../../components/AuthContext/AuthContext", () => ({
   useAuth: jest.fn(),
 }));
 

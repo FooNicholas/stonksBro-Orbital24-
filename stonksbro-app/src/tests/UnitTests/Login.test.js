@@ -2,11 +2,11 @@ import React from "react";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react"; // Import waitFor
 import "@testing-library/jest-dom";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
-import Login from "../components/Login/Login";
-import { useAuth } from "../components/AuthContext/AuthContext";
+import Login from "../../components/Login/Login";
+import { useAuth } from "../../components/AuthContext/AuthContext";
 
 // Mock useAuth
-jest.mock("../components/AuthContext/AuthContext", () => ({
+jest.mock("../../components/AuthContext/AuthContext", () => ({
   useAuth: jest.fn(),
 }));
 

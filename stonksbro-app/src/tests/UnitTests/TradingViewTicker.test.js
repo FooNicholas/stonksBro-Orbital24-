@@ -1,7 +1,7 @@
 import React from "react";
 import { render, screen, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
-import TradingViewTicker from "../components/TradingViewWidget/TradingViewTicker";
+import TradingViewTicker from "../../components/TradingViewWidget/TradingViewTicker";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 
 const renderWithProviders = (ui, { theme }) => {

@@ -4,11 +4,11 @@ import React from "react";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import { MemoryRouter } from "react-router-dom";
-import AddFriends from "../components/AddFriends/AddFriends";
-import { useAuth } from "../components/AuthContext/AuthContext";
+import AddFriends from "../../components/AddFriends/AddFriends";
+import { useAuth } from "../../components/AuthContext/AuthContext";
 
 // Mocking useAuth
-jest.mock("../components/AuthContext/AuthContext", () => ({
+jest.mock("../../components/AuthContext/AuthContext", () => ({
   useAuth: jest.fn(),
 }));
 

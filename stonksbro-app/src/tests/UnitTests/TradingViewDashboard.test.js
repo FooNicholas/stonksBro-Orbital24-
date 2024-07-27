@@ -1,14 +1,14 @@
 import React from "react";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
-import TradingViewDashboard from "../components/TradingViewWidget/TradingViewDashboard";
+import TradingViewDashboard from "../../components/TradingViewWidget/TradingViewDashboard";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
-import { ColorModeContext } from "../theme";
-import { useAuth } from "../components/AuthContext/AuthContext";
+import { ColorModeContext } from "../../theme";
+import { useAuth } from "../../components/AuthContext/AuthContext";
 import { MemoryRouter } from "react-router-dom";
 
 // Mock useAuth
-jest.mock("../components/AuthContext/AuthContext", () => ({
+jest.mock("../../components/AuthContext/AuthContext", () => ({
   useAuth: jest.fn(),
 }));
 

@@ -53,6 +53,7 @@ const Item = ({ title, to, icon, selected, setSelected }) => {
         }}
         onClick={() => setSelected(title)}
         icon={icon}
+        aria-label={title}
       >
         <Typography>{title}</Typography>
       </MenuItem>
@@ -274,6 +275,7 @@ const Navbar = () => {
               icon={<TvIcon />}
               selected={selected}
               setSelected={setSelected}
+              aria-label="Dashboard"
             />
 
             <Typography
@@ -289,6 +291,7 @@ const Navbar = () => {
               icon={<ContactsOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
+              aria-label="Friends"
             />
             <Item
               title="Add"
@@ -296,6 +299,7 @@ const Navbar = () => {
               icon={<PersonAddAltOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
+              aria-label="Add"
             />
 
             <Typography
@@ -311,6 +315,7 @@ const Navbar = () => {
               icon={<NewspaperIcon />}
               selected={selected}
               setSelected={setSelected}
+              aria-label="News"
             />
             {/* <Item
               title="Calendar"
@@ -325,6 +330,7 @@ const Navbar = () => {
               icon={<BalanceIcon />}
               selected={selected}
               setSelected={setSelected}
+              aria-label="Trading Simulator"
             />
 
             {/* <Typography
