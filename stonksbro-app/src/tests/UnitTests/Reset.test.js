@@ -1,8 +1,14 @@
 import React from "react";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
-import { MemoryRouter } from "react-router-dom";
+import { MemoryRouter, useNavigate } from "react-router-dom";
 import Reset from "../../components/Reset/Reset";
+
+// Mock useNavigate
+jest.mock("react-router-dom", () => ({
+  ...jest.requireActual("react-router-dom"),
+  useNavigate: jest.fn(),
+}));
 
 // Mock MessageBox component
 jest.mock("../../components/MessageBox/MessageBox", () => ({
@@ -25,6 +31,7 @@ describe("Reset Component", () => {
         json: () => Promise.resolve({}),
       })
     );
+    useNavigate.mockReturnValue(jest.fn());
   });
 
   afterEach(() => {
@@ -32,12 +39,15 @@ describe("Reset Component", () => {
     global.fetch = originalFetch;
   });
 
-  test("renders reset form", () => {
+  const renderComponent = () =>
     render(
       <MemoryRouter>
         <Reset />
       </MemoryRouter>
     );
+
+  test("renders reset form", () => {
+    renderComponent();
 
     expect(screen.getByPlaceholderText(/email/i)).toBeInTheDocument();
     expect(screen.getByText("Reset Password")).toBeInTheDocument();
@@ -48,11 +58,7 @@ describe("Reset Component", () => {
   });
 
   test("shows error message when email is not provided", async () => {
-    render(
-      <MemoryRouter>
-        <Reset />
-      </MemoryRouter>
-    );
+    renderComponent();
 
     fireEvent.click(screen.getByRole("button", { name: /confirm/i }));
 
@@ -64,11 +70,7 @@ describe("Reset Component", () => {
   });
 
   test("shows success message when password reset email is sent", async () => {
-    render(
-      <MemoryRouter>
-        <Reset />
-      </MemoryRouter>
-    );
+    renderComponent();
 
     fireEvent.change(screen.getByPlaceholderText(/email/i), {
       target: { value: "test@example.com" },
@@ -91,11 +93,7 @@ describe("Reset Component", () => {
       })
     );
 
-    render(
-      <MemoryRouter>
-        <Reset />
-      </MemoryRouter>
-    );
+    renderComponent();
 
     fireEvent.change(screen.getByPlaceholderText(/email/i), {
       target: { value: "test@example.com" },
@@ -109,6 +107,9 @@ describe("Reset Component", () => {
   });
 
   test("navigates to login page when 'Click Here!' is clicked", () => {
+    const navigate = jest.fn();
+    useNavigate.mockReturnValue(navigate);
+
     render(
       <MemoryRouter initialEntries={["/reset"]}>
         <Reset />
@@ -118,6 +119,6 @@ describe("Reset Component", () => {
     const loginLink = screen.getByText(/click here!/i);
     fireEvent.click(loginLink);
 
-    expect(window.location.pathname).toBe("/");
+    expect(navigate).toHaveBeenCalledWith("/");
   });
 });
