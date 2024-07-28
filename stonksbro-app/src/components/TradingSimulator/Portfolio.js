@@ -304,6 +304,7 @@ const Portfolio = () => {
         setPortfolio(data[0].trades);
         fetchRealTimePrices(data[0].trades);
         setAccountBalance(data[0].balance);
+        setPortfolioLoading(false);
       } else {
         console.error("Failed to fetch portfolio");
       }

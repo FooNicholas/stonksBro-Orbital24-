@@ -65,7 +65,6 @@ const Topbar = () => {
 
   return (
     <Box display="flex" justifyContent="space-between" p={2}>
-      {/* Search Bar */}
       <Box></Box>
 
       {/* Icons */}

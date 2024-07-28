@@ -41,6 +41,7 @@ const Login = () => {
     e.preventDefault();
     if (validateForm()) {
       try {
+        console.log("Form is valid, calling login...");
         const response = await fetch(
           "https://stonks-bro-orbital24-server.vercel.app/login",
           {

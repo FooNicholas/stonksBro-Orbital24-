@@ -329,7 +329,21 @@ const Dashboard = () => {
                       </Box>
                     ))
                   ) : (
-                    "No Recent Transactions"
+                    <Box
+                      display="flex"
+                      justifyContent="center"
+                      alignItems="center"
+                      width="100%"
+                      height="70%"
+                    >
+                      <Typography
+                        sx={{ mr: "15px" }}
+                        variant="h5"
+                        fontWeight="600"
+                      >
+                        No Recent Transactions
+                      </Typography>
+                    </Box>
                   )}
                 </Box>
               </Box>

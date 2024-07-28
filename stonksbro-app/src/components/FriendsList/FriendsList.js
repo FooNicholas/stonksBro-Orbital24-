@@ -277,7 +277,7 @@ const Friends = () => {
                   FRIEND PROFILE
                 </Typography>
                 <IconButton
-                  aria-label="close"
+                  aria-label="close profile"
                   onClick={handleFriendProfileClose}
                   sx={{
                     position: "absolute",
@@ -408,7 +408,7 @@ const Friends = () => {
                         );
                       })
                     ) : (
-                      <Typography>No portfolio available</Typography>
+                      <Typography>No portfolio available.</Typography>
                     )}
                   </Box>
                 </Box>

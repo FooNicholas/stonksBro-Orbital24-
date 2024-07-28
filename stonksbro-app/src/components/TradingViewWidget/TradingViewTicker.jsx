@@ -11,7 +11,8 @@ const TradingViewTicker = ({ symbol }) => {
     containerRef.current.innerHTML = "";
 
     const script = document.createElement("script");
-    script.src = "https://s3.tradingview.com/external-embedding/embed-widget-single-quote.js";
+    script.src =
+      "https://s3.tradingview.com/external-embedding/embed-widget-single-quote.js";
     script.type = "text/javascript";
     script.async = true;
     script.innerHTML = JSON.stringify({
@@ -26,6 +27,7 @@ const TradingViewTicker = ({ symbol }) => {
   return (
     <Box
       ref={containerRef}
+      role="region"
       sx={{
         width: "100%",
         maxWidth: 600,
