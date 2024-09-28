@@ -1,70 +1,87 @@
 # stonksBro-Orbital24-
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## Stock Trading Web Application
 
-## Available Scripts
+A web-based stock trading simulator built using React, Material-UI, and Node.js. This application allows users to manage their portfolios, trade stocks/crypto, customize their dashboard, follow friends, read financial news, and much more.
 
-In the project directory, you can run:
+## Features
 
-### `npm start`
+### 1. User Authentication
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+#### Login Page
+Users can log in with the following required fields:
+- **Email:** Must be registered and valid.
+- **Password:** Must be registered and valid.
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+#### Registration Page
+New users can create an account by providing:
+- **Username:** Must be unique and valid.
+- **Email:** Must be unique and valid.
+- **Password:** At least 8 characters, includes one number, and one special character.
+- **Confirm Password:** Must match the password.
 
-### `npm test`
+#### Reset Password
+Users can reset forgotten passwords by entering their registered email address.
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+### 2. Dashboard
 
-### `npm run build`
+The dashboard has 6 main components:
+- **Top bar**
+- **Sidebar**
+- **Tickers**
+- **Graph, Watchlist, and Symbol Details**
+- **Top Stories (News)**
+- **Recent Transactions**
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+#### Top Bar
+- **Dark/Light Mode Toggle:** Switch between light and dark themes.
+- **Notifications:** Displays friend requests.
+- **Logout:** Logs the user out.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+#### Sidebar
+Navigate through the app using the sidebar, with options like:
+- **Dashboard**
+- **Profile**
+- **Friends**
+- **News**
+- **Trading Simulator**
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+#### Ticker Customization
+Users can customize ticker boxes to track stock symbols of interest. They can input a symbol, change, and save preferences.
 
-### `npm run eject`
+#### Recent Transactions
+A section displaying the last 10 trading transactions.
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+### 3. Chart & Watchlist
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+This component displays a financial chart for selected stocks or cryptos. Users can:
+- **View graphs:** Click symbols on the watchlist to update the chart.
+- **Add/Remove symbols:** Manage their watchlist by adding or removing symbols.
+- **Use drawing tools:** Perform financial analysis using charting tools.
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+### 4. Friend List
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+Users can manage their friends list:
+- **View Friends:** Display friends and their avatars.
+- **Remove Friends:** A pop-up confirmation appears before removal.
+- **View Friend Profiles:** Clicking on avatars shows their trades and watchlists.
 
-## Learn More
+### 5. News
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+Users can view financial news related to their watchlist or search for specific stocks/cryptos.
+- **Autocomplete Search:** Suggests stock symbols as users type.
+- **News Feed:** Clicking a stock symbol retrieves the latest 40 news articles, sorted by relevancy and date.
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+### 6. Trading Simulator
 
-### Code Splitting
+A virtual stock trading simulator where users can:
+- **Trade stocks/cryptos:** Buy and sell assets using virtual currency.
+- **View Portfolio:** Displays account balance, positions, profits, and losses.
+- **Add Funds:** Users can add virtual currency to their account.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+## Technologies Used
+- **Frontend:** React, Material-UI, React-router-dom
+- **Backend:** Node.js, Supabase
+- **APIs:** TradingView, Finnhub
+- **Email Service:** Nodemailer with Gmail SMTP
+- **Database:** PostgreSQL (via Supabase)
